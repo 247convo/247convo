@@ -3,7 +3,7 @@
 # ─────────────────────────────────────────────────────────────────────────────
 import os, ast, re, time, traceback, collections
 from typing import List, Tuple
-import datetime                                   # ← NEW (for readable timestamp)
+import datetime
 
 import numpy as np
 from fastapi import FastAPI, Request, HTTPException
@@ -11,8 +11,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from dotenv import load_dotenv
 from supabase import create_client
-from openai import OpenAI                          # SDK v1
-# ─────────────────────────────────────────────────────────────────────────────
+from openai import OpenAI
 
 # 1. ENV & CLIENTS ───────────────────────────────────────────────────────────
 load_dotenv()
@@ -21,7 +20,7 @@ OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 SUPABASE_URL   = os.getenv("SUPABASE_URL")
 SUPABASE_KEY   = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
 TABLE_NAME     = os.getenv("SUPABASE_TABLE_NAME") or "smoothietexts_ai"
-API_TOKEN      = os.getenv("API_TOKEN")            # 👈 secure token
+API_TOKEN      = os.getenv("API_TOKEN")  # 👈 secure token
 
 def _mask(s: str | None) -> str: return f"{s[:4]}…{s[-4:]}" if s else "❌ NONE"
 print("🔧 ENV →", "OPENAI", _mask(OPENAI_API_KEY),
@@ -123,7 +122,6 @@ async def options_chat(): return JSONResponse(content={}, status_code=204)
 async def chat(req: Request):
     payload = await req.json()
 
-    # 🔒 Token check
     if payload.get("token") != API_TOKEN:
         raise HTTPException(401, "Unauthorized – bad token")
 
@@ -137,18 +135,39 @@ async def chat(req: Request):
 
     try:
         bot_answer = answer(user_q)
-
-        # ── NEW 4-LINE INSERT INTO chat_logs ───────────────────────────────
-        supabase.table("chat_logs").insert({
-            "question"   : user_q,
-            "answer"     : bot_answer,
-            "timestamp"  : datetime.datetime.utcnow().isoformat(),  # UTC ISO-string
-            "ip_address" : client_ip
-        }).execute()
-        # -------------------------------------------------------------------
-
         return {"answer": bot_answer}
 
     except Exception:
         print("❌ CRASH in /chat"); traceback.print_exc()
         return {"answer":"Sorry, something went wrong. Please try again later."}
+
+# ─────────────────────────────────────────────────────────────────────────────
+# NEW: Chat summary endpoint to save { name, email, chat_log } to Supabase
+# ─────────────────────────────────────────────────────────────────────────────
+@app.post("/summary")
+async def save_chat_summary(req: Request):
+    try:
+        payload = await req.json()
+        if payload.get("token") != API_TOKEN:
+            raise HTTPException(401, "Unauthorized – bad token")
+
+        name      = payload.get("name", "").strip()
+        email     = payload.get("email", "").strip()
+        chat_log  = payload.get("chat_log", [])
+        timestamp = datetime.datetime.utcnow().isoformat()
+
+        if not name or not email or not chat_log:
+            raise HTTPException(400, "Missing required fields.")
+
+        supabase.table("chat_logs").insert({
+            "name"      : name,
+            "email"     : email,
+            "chat_log"  : chat_log,
+            "timestamp" : timestamp
+        }).execute()
+
+        return {"status": "Chat summary saved."}
+
+    except Exception as e:
+        print("❌ CRASH in /summary"); traceback.print_exc()
+        return JSONResponse(status_code=500, content={"error": "Internal error"})
