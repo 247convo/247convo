@@ -8,7 +8,7 @@
 
     try {
       // 0. Fetch config.json
-      const res = await fetch('https://247convo.onrender.com/config.json');
+      const res = await fetch('https://two47convo.onrender.com/config.json');
       const config = await res.json();
 
       // Inject config as a global JS object
@@ -20,11 +20,11 @@
       // 1. Load CSS
       const css = document.createElement('link');
       css.rel = 'stylesheet';
-      css.href = 'https://247convo.onrender.com/247convo-style.css';
+      css.href = 'https://two47convo.onrender.com/247convo-style.css';
       document.head.appendChild(css);
 
       // 2. Load Widget HTML
-      const htmlRes = await fetch('https://247convo.onrender.com/247convo-widget.html');
+      const htmlRes = await fetch('https://two47convo.onrender.com/247convo-widget.html');
       let html = await htmlRes.text();
 
       // 3. Replace placeholders using config
@@ -52,7 +52,7 @@
 
   function injectScript() {
     const script = document.createElement('script');
-    script.src = 'https://247convo.onrender.com/247convo-script.js';
+    script.src = 'https://two47convo.onrender.com/247convo-script.js';
     script.defer = false;
     document.body.appendChild(script);
   }
