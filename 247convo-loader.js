@@ -24,7 +24,7 @@
       document.head.appendChild(css);
 
       // 2. Load Widget HTML
-      const htmlRes = await fetch('https://two47convo.onrender.com/247convo-widget.html');
+      const htmlRes = await fetch('https://two47convo.onrender.com/index.html');
       let html = await htmlRes.text();
 
       // 3. Replace placeholders using config
