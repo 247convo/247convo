@@ -1,11 +1,10 @@
 # ─────────────────────────────────────────────────────────────────────────────
-#  chatbot_api.py – 247Convo backend (Config-driven, token-protected, Supabase logging)
+#  chatbot_api.py – 247Convo backend (STRICT KB logic + token + Supabase logging)
 # ─────────────────────────────────────────────────────────────────────────────
-import os, ast, re, time, traceback, collections, json
+import os, ast, re, time, traceback, collections, datetime, json, requests
 from typing import List, Tuple
-import datetime
-
 import numpy as np
+
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -13,16 +12,17 @@ from dotenv import load_dotenv
 from supabase import create_client
 from openai import OpenAI
 
-# 1. ENV & CONFIG LOADING ─────────────────────────────────────────────────────
+# 1. ENV & CLIENTS ───────────────────────────────────────────────────────────
 load_dotenv()
 
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 SUPABASE_URL   = os.getenv("SUPABASE_URL")
 SUPABASE_KEY   = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
-TABLE_NAME     = os.getenv("SUPABASE_TABLE_NAME") or "smoothietexts_ai"
-API_TOKEN      = os.getenv("API_TOKEN")  # 👈 secure token
+TABLE_NAME     = os.getenv("SUPABASE_TABLE_NAME") or "chat_kb"
+API_TOKEN      = os.getenv("API_TOKEN")
+CONFIG_URL     = os.getenv("CONFIG_URL")
 
-def _mask(s: str | None) -> str: return f"{s[:4]}…{s[-4:]}" if s else "❌ NONE"
+def _mask(s): return f"{s[:4]}…{s[-4:]}" if s else "❌ NONE"
 print("🔧 ENV →", "OPENAI", _mask(OPENAI_API_KEY),
       "| SUPABASE_URL", SUPABASE_URL or "❌",
       "| TABLE", TABLE_NAME,
@@ -34,18 +34,22 @@ if not (OPENAI_API_KEY and SUPABASE_URL and SUPABASE_KEY):
 openai_client = OpenAI(api_key=OPENAI_API_KEY)
 supabase      = create_client(SUPABASE_URL, SUPABASE_KEY)
 
-# Load config.json
+# 2. CONFIG LOAD ─────────────────────────────────────────────────────────────
+CONFIG_URL = os.getenv("CONFIG_URL") or "https://247convo.onrender.com/config.json"
 try:
-    with open("config.json", "r") as f:
-        config = json.load(f)
-        BOT_NAME    = config.get("botName", "247Convo Bot")
-        SUPPORT_URL = config.get("supportUrl", "https://example.com/support")
-except:
-    print("⚠️ Could not load config.json. Using fallback defaults.")
-    BOT_NAME    = "247Convo Bot"
-    SUPPORT_URL = "https://example.com/support"
+    CONFIG = requests.get(CONFIG_URL).json()
+    print("✅ config.json loaded:", CONFIG.get("chatbotName"))
+except Exception as e:
+    print("❌ Failed to load config.json")
+    CONFIG = {
+        "chatbotName": "ConvoBot",
+        "supportUrl": "https://247convo.com/support"
+    }
 
-# 2. EMBEDDINGS / SIMILARITY ────────────────────────────────────────────────
+BOT_NAME    = CONFIG.get("chatbotName", "ConvoBot")
+SUPPORT_URL = CONFIG.get("supportUrl", "https://247convo.com/support")
+
+# 3. EMBEDDINGS ─────────────────────────────────────────────────────────────
 def get_embedding(text: str) -> List[float]:
     emb = openai_client.embeddings.create(
         model="text-embedding-ada-002",
@@ -70,13 +74,13 @@ def fetch_best_match(q: str) -> Tuple[str, float]:
             best, best_score = r["content"], score
     return best, best_score
 
-# 3. GREETING DETECTOR ───────────────────────────────────────────────────────
+# 4. GREETING DETECTOR ───────────────────────────────────────────────────────
 GREETING_RE = re.compile(
     r"\b(hi|hello|hey|howdy|good\s?(morning|afternoon|evening)|what'?s up)\b", re.I
 )
 def is_greeting(t: str) -> bool: return bool(GREETING_RE.search(t.strip()))
 
-# 4. ULTRA-LIGHT RATE LIMIT ─────────────────────────────────────────────────
+# 5. RATE LIMIT ─────────────────────────────────────────────────────────────
 RATE_LIMIT, RATE_PERIOD = 30, 60
 _ip_hits: dict[str, collections.deque] = {}
 def rate_limited(ip: str) -> bool:
@@ -85,7 +89,7 @@ def rate_limited(ip: str) -> bool:
     if len(bucket) >= RATE_LIMIT: return True
     bucket.append(now); return False
 
-# 5. ANSWER PIPELINE ─────────────────────────────────────────────────────────
+# 6. ANSWER PIPELINE ────────────────────────────────────────────────────────
 def answer(user_q: str) -> str:
     ctx, score = fetch_best_match(user_q)
     if score >= SIM_THRESHOLD:
@@ -96,7 +100,7 @@ def answer(user_q: str) -> str:
         )
         chat = openai_client.chat.completions.create(
             model="gpt-3.5-turbo",
-            messages=[{"role": "user", "content": prompt}]
+            messages=[{"role":"user","content":prompt}]
         )
         return chat.choices[0].message.content.strip()
 
@@ -104,11 +108,9 @@ def answer(user_q: str) -> str:
         chat = openai_client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
-                {
-                    "role": "system",
-                    "content": f"You are {BOT_NAME}, a friendly, concise chatbot. Reply with a short warm greeting."
-                },
-                {"role": "user", "content": user_q}
+                {"role":"system",
+                 "content": f"You are {BOT_NAME}, a friendly, concise chatbot. Reply with a short warm greeting."},
+                {"role":"user","content":user_q}
             ]
         )
         return chat.choices[0].message.content.strip()
@@ -116,7 +118,7 @@ def answer(user_q: str) -> str:
     return (f"I couldn't find that in my knowledge base. "
             f"Please check our support page: {SUPPORT_URL}")
 
-# 6. FASTAPI APP ─────────────────────────────────────────────────────────────
+# 7. FASTAPI APP ────────────────────────────────────────────────────────────
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
@@ -127,7 +129,7 @@ app.add_middleware(
 )
 
 @app.get("/")
-def root(): return {"status": "247Convo backend running"}
+def root(): return {"status": "247Convo backend running", "bot": BOT_NAME}
 
 @app.options("/chat")
 async def options_chat(): return JSONResponse(content={}, status_code=204)
@@ -156,7 +158,7 @@ async def chat(req: Request):
         traceback.print_exc()
         return {"answer": "Sorry, something went wrong. Please try again later."}
 
-# 7. CHAT SUMMARY ENDPOINT ───────────────────────────────────────────────────
+# 8. SUMMARY LOG ────────────────────────────────────────────────────────────
 @app.post("/summary")
 async def save_chat_summary(req: Request):
     try:
