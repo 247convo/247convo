@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{{brandName}} Chat Widget</title>
+
+  <!-- Load CSS from Render -->
+  <link rel="stylesheet" href="https://247convo.onrender.com/247convo-style.css" />
+  <style>
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Chat Bubble -->
+  <div id="chat-bubble">💬</div>
+  <div id="chat-bubble-msg">Need help? Ask {{chatbotName}}.</div>
+
+  <!-- Chat Popup -->
+  <div class="chat-popup" id="chatPopup">
+    <div class="chat-header">
+      {{brandName}} Assistant
+      <button class="close-btn" onclick="toggleChat()">✖</button>
+    </div>
+
+    <!-- Lead Form -->
+    <div id="leadForm" class="lead-form-section">
+      <div class="lead-form-wrapper">
+        <p style="margin-bottom: 1rem;">👋 Hi! Before we chat, what’s your name and email?</p>
+        <input type="text" id="leadName" placeholder="Your Name" required />
+        <input type="email" id="leadEmail" placeholder="Your Email" required />
+        <button onclick="submitLead()">Start Chat</button>
+        <p id="leadError" style="color:red; font-size: 0.85rem; display:none; margin-top:0.5rem;"></p>
+      </div>
+    </div>
+
+    <!-- Chat Section -->
+    <div id="chatBox" class="hidden">
+      <div class="chatbox" id="chat">
+        <div class="quick-options" id="quickOpts">
+          <button onclick="quickAsk('{{option1}}')">{{option1}}</button>
+          <button onclick="quickAsk('{{option2}}')">{{option2}}</button>
+          <button onclick="quickAsk('{{option3}}')">{{option3}}</button>
+        </div>
+      </div>
+
+      <div class="support-link">
+        <a href="{{supportUrl}}" target="_blank">
+          📞 Need more help? Contact Support
+        </a>
+      </div>
+
+      <div class="input-section">
+        <input type="text" id="userInput" placeholder="Type your message…" onkeydown="handleKey(event)" />
+        <button onclick="sendMessage()">Send</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Audio -->
+  <audio id="bubbleSound" src="https://www.smoothietexts.com/wp-content/uploads/2025/06/mixkit-software-interface-start-2574.wav" preload="auto"></audio>
+  <audio id="replySound" src="https://www.smoothietexts.com/wp-content/uploads/2025/06/mixkit-correct-answer-tone-2870.wav" preload="auto"></audio>
+
+  <!-- Load Chat Script -->
+  <script src="https://247convo.onrender.com/247convo-script.js" defer></script>
+</body>
+</html>

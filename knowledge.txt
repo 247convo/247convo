@@ -22,7 +22,7 @@ HOW DOES IT WORK?
 • These flavors are carefully curated to be nutritious, delicious, and exciting.
 
 3. ORDER IN SECONDS:
-• If you like the flavor, reply with “1” and tap send.
+• If you like the flavor, reply to the text message with quantity you want and tap send.
 • That’s it—no checkout, no login, no friction.
 • The smoothie is automatically shipped to your saved address using your stored payment info.
 
@@ -90,13 +90,20 @@ Q: How do I get started?
 A: Just subscribe once. Enter your shipping and payment details, then reply to smoothie texts to order.
 
 Q: How do I order a smoothie?
-A: You receive daily texts. If you like the smoothie, reply with 1 and we'll ship it instantly.
+A: First things first—head over to www.smoothietexts.com and sign up by filling in your details. After that, you’ll get daily text messages with the smoothie mixes of the day. See one you like? Just reply to the text with how many you want—easy! We’ll take it from there and deliver straight to your doorstep. 🥤🚚
 
 Q: Do I need to log in each time?
 A: No! SmoothieTexts is fully automated. You don't need to log in or pull out your card again.
 
+Q: What if I want to order a smoothie mix that was sent via text message previously?
+A: No problem at all! Just reply to the text message with the name of the smoothie mix from that day and the quantity you want.
+We’ll confirm your order and get it delivered to your address—simple and sweet! 🥤✅
+
 Q: Where if I don't know if I need the smoothies?
 A: Take our smoothie quiz to get the best match: https://jack-hqerki6s.scoreapp.com/
+
+Q: I can’t seem to find where to insert my card details, or the website is showing an error?
+A: Refresh the website and try again. If after two attempts the issue persists, simply click the Contact Support link below. Our team will assist you immediately.
 
 
 ---
