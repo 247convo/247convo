@@ -37,7 +37,7 @@ data = {
     "embedding": embedding
 }
 
-response = requests.post(f"{supabase_url}/rest/v1/smoothietexts_ai", headers=headers, json=data)
+response = requests.post(f"{supabase_url}/rest/v1/247convo", headers=headers, json=data)
 
 if response.status_code == 201:
     print("✅ Upload successful!")

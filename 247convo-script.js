@@ -101,7 +101,7 @@
       chatLog += `You: ${txt}\n`;
 
       try {
-        const res = await fetch('https://247convo.onrender.com/chat', {
+        const res = await fetch('https://two47convobot.onrender.com/chat', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -127,7 +127,7 @@
 
     window.addEventListener('beforeunload', () => {
       if (leadSubmitted && chatLog.trim()) {
-        fetch('https://247convo.onrender.com/summary', {
+        fetch('https://two47convobot.onrender.com/summary', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
