@@ -30,16 +30,17 @@
     const popup = document.getElementById('chatPopup');
     const msg = document.getElementById('chat-bubble-msg');
     const snd = document.getElementById('bubbleSound');
+    const userInput = document.getElementById('userInput');
+    const sendBtn = document.querySelector('.input-section button');
 
-    if (!bubble || !popup) return;
+    if (!bubble || !popup || !userInput || !sendBtn) return;
 
     let chatLog = '';
     let userName = '';
     let userEmail = '';
     let leadSubmitted = false;
-    let collecting = 'name'; // name > email > ready
+    let collecting = 'name';
 
-    // Inject text
     document.title = `${brandName} Chat Widget`;
     if (msg) msg.innerText = `Need help? Ask ${chatbotName}.`;
 
@@ -48,20 +49,6 @@
 
     const supportLink = document.querySelector('.support-link a');
     if (supportLink) supportLink.href = supportUrl;
-
-    // === Toggle popup ===
-    window.toggleChat = () => {
-      const isOpen = popup.classList.contains('open');
-      popup.classList.toggle('open', !isOpen);
-      msg.style.display = isOpen ? 'block' : 'none';
-      if (!isOpen) snd?.play();
-
-      if (!leadSubmitted) {
-        showMessage(`👋 Hello! Before we begin, what’s your **first name**?`);
-      }
-    };
-
-    bubble.addEventListener('click', window.toggleChat);
 
     const now = () =>
       new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -84,27 +71,12 @@
         </div>`;
     };
 
-    window.handleKey = e => {
-      if (e.key === 'Enter') handleInput();
-    };
-
-    // ✅ Hook up send button to handleInput
-    const sendBtn = document.querySelector('.input-section button');
-    if (sendBtn) sendBtn.addEventListener('click', handleInput);
-
-    window.quickAsk = txt => {
-      document.getElementById('quickOpts')?.remove();
-      document.getElementById('userInput').value = txt;
-      handleInput();
-    };
-
     const handleInput = () => {
-      const input = document.getElementById('userInput');
-      const txt = input.value.trim();
+      const txt = userInput.value.trim();
       if (!txt) return;
 
       showMessage(txt, true);
-      input.value = '';
+      userInput.value = '';
 
       if (!leadSubmitted) {
         if (collecting === 'name') {
@@ -156,6 +128,31 @@
       chat.scrollTop = chat.scrollHeight;
     };
 
+    // ✅ BIND ENTER KEY AND SEND BUTTON
+    userInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') handleInput();
+    });
+    sendBtn.addEventListener('click', handleInput);
+
+    window.quickAsk = (txt) => {
+      document.getElementById('quickOpts')?.remove();
+      userInput.value = txt;
+      handleInput();
+    };
+
+    window.toggleChat = () => {
+      const isOpen = popup.classList.contains('open');
+      popup.classList.toggle('open', !isOpen);
+      msg.style.display = isOpen ? 'block' : 'none';
+      if (!isOpen) snd?.play();
+
+      if (!leadSubmitted) {
+        showMessage(`👋 Hello! Before we begin, what’s your **first name**?`);
+      }
+    };
+
+    bubble.addEventListener('click', window.toggleChat);
+
     // Save summary on refresh
     window.addEventListener('beforeunload', () => {
       if (leadSubmitted && chatLog.trim()) {
@@ -172,7 +169,6 @@
       }
     });
 
-    // Play welcome sound once
     let soundPlayed = false;
     const playBubbleSoundOnce = () => {
       if (!soundPlayed) {
