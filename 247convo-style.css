@@ -369,6 +369,10 @@ width: 40%;
   #chat-bubble {
     bottom: 15px;
   }
+
+.msg-wrapper.user {
+    width: 60%;
+}
 }
 
 @media (max-width: 480px) {
