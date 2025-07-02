@@ -270,12 +270,15 @@ box-shadow: 0 8px 22px rgba(0, 0, 0, 0.25);
 }
 .msg-wrapper.user p {
   margin-right: 0;
+  padding: 3px 1px;
+  word-wrap: break-word;
+  font-size: 0.95rem;
 }
 
 .msg-wrapper.bot {
   display: flex;
   align-items: flex-start;
-  gap: 10px;
+  gap: 2px;
 }
 
 .msg-wrapper.bot .bot-avatar {
@@ -289,16 +292,10 @@ box-shadow: 0 8px 22px rgba(0, 0, 0, 0.25);
 }
 
 .msg-wrapper.bot p {
-  margin: 0;
-  background: #ffffff;
-  color: #000000;
-  padding: 10px 14px;
-  border-radius: 16px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  max-width: 75%;
+  padding: 3px 1px;
   word-wrap: break-word;
-  line-height: 1.4;
   font-size: 0.95rem;
+  max-width: 85%;
 }
 
 
