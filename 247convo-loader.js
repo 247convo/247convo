@@ -1,4 +1,4 @@
-// === 247Convo Loader (with dynamic config support) ===
+// === 247Convo Loader (with dynamic config support + CSS variable fix) ===
 (function () {
   let started = false;
 
@@ -17,7 +17,20 @@
       configScript.textContent = `window.__247CONVO_CONFIG__ = ${JSON.stringify(config)};`;
       document.head.appendChild(configScript);
 
-      // 1. Load CSS
+      // ✅ Inject dynamic CSS variables for colors
+      const styleVars = document.createElement('style');
+      styleVars.innerHTML = `
+        :root {
+          --primary-color: ${config.primaryColor};
+          --accent-color: ${config.accentColor};
+          --light-accent: ${config.lightAccent};
+          --button-color: ${config.buttonColor};
+          --text-light: ${config.textLight};
+        }
+      `;
+      document.head.appendChild(styleVars);
+
+      // 1. Load CSS file
       const css = document.createElement('link');
       css.rel = 'stylesheet';
       css.href = 'https://two47convo.onrender.com/247convo-style.css';
