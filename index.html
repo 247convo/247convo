@@ -27,15 +27,28 @@
     </div>
 
     <!-- Lead Form -->
-    <div id="leadForm" class="lead-form-section">
-      <div class="lead-form-wrapper">
-        <p style="margin-bottom: 1rem;">👋 Hi! Before we chat, what’s your name and email?</p>
-        <input type="text" id="leadName" placeholder="Your Name" required />
-        <input type="email" id="leadEmail" placeholder="Your Email" required />
-        <button onclick="submitLead()">Start Chat</button>
-        <p id="leadError" style="color:red; font-size: 0.85rem; display:none; margin-top:0.5rem;"></p>
-      </div>
+<div id="leadForm" class="lead-form-section glass-card">
+  <div class="lead-form-wrapper">
+    <h3 class="welcome-title">Welcome back</h3>
+    <p class="welcome-subtext">Please enter your details.</p>
+
+    <div class="input-group">
+      <span class="input-icon">👤</span>
+      <input type="text" id="leadName" placeholder="John Doe" required />
+      <span class="validation-icon" id="nameValid">✅</span>
     </div>
+
+    <div class="input-group">
+      <span class="input-icon">✉️</span>
+      <input type="email" id="leadEmail" placeholder="john.doe@example.com" required />
+      <span class="validation-icon" id="emailValid">✅</span>
+    </div>
+
+    <button class="lead-submit-btn" onclick="submitLead()">Continue</button>
+    <p id="leadError" style="color:red; font-size: 0.85rem; display:none; margin-top:0.5rem;"></p>
+  </div>
+</div>
+
 
     <!-- Chat Section -->
     <div id="chatBox" class="hidden">
