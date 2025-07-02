@@ -147,7 +147,7 @@
       if (!isOpen) snd?.play();
 
       if (!leadSubmitted) {
-        showMessage(`👋 Hello! Before we begin, what’s your **first name**?`);
+        showMessage(`👋 Hello! Before we begin, what’s your name?`);
       }
     };
 
