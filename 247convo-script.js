@@ -62,24 +62,28 @@
 
     // ✅ Show Message with Avatar (bot only)
     const showMessage = (text, isUser = false, isTyping = false, id = '') => {
-      const chat = document.getElementById('chat');
-      const className = isUser ? 'user' : 'bot';
-      const prefix = isUser ? '🙋 You: ' : '';
-      const avatarHTML = isUser
-        ? ''
-        : `<div class="bot-avatar" style="background-image: url('${avatarUrl}')"></div>`;
-      const bubbleID = id ? `id="${id}"` : '';
+  const chat = document.getElementById('chat');
+  const className = isUser ? 'user' : 'bot';
+  const prefix = isUser ? '🙋 You: ' : '';
+  const bubbleID = id ? `id="${id}"` : '';
 
-      chat.innerHTML += `
-        <div class="msg-wrapper ${className}">
-          ${avatarHTML}
-          <p class="${className}" ${bubbleID}>
-            ${prefix}${text}
-            ${!isTyping ? `<span class="timestamp">${now()}</span>` : ''}
-          </p>
-        </div>`;
-      chat.scrollTop = chat.scrollHeight;
-    };
+  // ✅ Only show avatar if bot and NOT typing (prevents duplicate container)
+  const avatarHTML = (!isUser && !isTyping)
+    ? `<div class="bot-avatar" style="background-image: url('${avatarUrl}')"></div>`
+    : '';
+
+  chat.innerHTML += `
+    <div class="msg-wrapper ${className}">
+      ${avatarHTML}
+      <p class="${className}" ${bubbleID}>
+        ${prefix}${text}
+        ${!isTyping ? `<span class="timestamp">${now()}</span>` : ''}
+      </p>
+    </div>`;
+    
+  chat.scrollTop = chat.scrollHeight;
+};
+
 
     const insertQuickOptions = () => {
       const chat = document.getElementById('chat');

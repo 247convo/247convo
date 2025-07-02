@@ -270,6 +270,20 @@ box-shadow: 0 8px 22px rgba(0, 0, 0, 0.25);
   margin-right: 0;
 }
 
+.msg-wrapper.bot {
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.msg-wrapper.bot p {
+  margin-left: 0;
+}
+
+.msg-wrapper.bot .bot-avatar + p {
+  margin-top: 0; /* Prevents extra spacing when avatar is present */
+}
+
+
 /* ✅ Typing animation (3 bouncing dots) */
 .typing {
   display: inline-flex;
