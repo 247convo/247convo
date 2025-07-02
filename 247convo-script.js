@@ -1,6 +1,31 @@
-// === 247Convo Chat Logic (white-labeled) ===
+// === 247Convo Chat Logic with config loader ===
 (function () {
-  const run = () => {
+  const CONFIG_URL = "https://two47convo.onrender.com/config.json";
+
+  async function loadConfig() {
+    try {
+      const res = await fetch(CONFIG_URL);
+      if (!res.ok) throw new Error("Failed to load config");
+      return await res.json();
+    } catch (err) {
+      console.error("❌ Error loading config.json:", err);
+      return {};
+    }
+  }
+
+  const run = async () => {
+    const config = await loadConfig();
+
+    const {
+      chatbotName = "247Convo Bot",
+      brandName = "247Convo",
+      quickOption1 = "What's your pricing?",
+      quickOption2 = "How do I integrate?",
+      quickOption3 = "Talk to a human",
+      supportUrl = "https://two47convo.com/support",
+      token = "",
+    } = config;
+
     const bubble = document.getElementById('chat-bubble');
     const popup = document.getElementById('chatPopup');
     const msg = document.getElementById('chat-bubble-msg');
@@ -13,9 +38,24 @@
     let userEmail = '';
     let leadSubmitted = false;
 
-    // === Fallback Bot Name & User Label ===
-    const safeBotName = '{{botName}}'.includes('{{') ? '247Convo Bot' : '{{botName}}';
-    const userLabel = '{{userLabel}}'.includes('{{') ? '🙋 You:' : '{{userLabel}}';
+    // Inject text based on config
+    document.title = `${brandName} Chat Widget`;
+    if (msg) msg.innerText = `Need help? Ask ${chatbotName}.`;
+
+    const header = popup.querySelector('.chat-header');
+    if (header) header.childNodes[0].textContent = `${brandName} Assistant`;
+
+    const supportLink = document.querySelector('.support-link a');
+    if (supportLink) supportLink.href = supportUrl;
+
+    const quickOpts = document.getElementById('quickOpts');
+    if (quickOpts) {
+      quickOpts.innerHTML = `
+        <button onclick="quickAsk('${quickOption1}')">${quickOption1}</button>
+        <button onclick="quickAsk('${quickOption2}')">${quickOption2}</button>
+        <button onclick="quickAsk('${quickOption3}')">${quickOption3}</button>
+      `;
+    }
 
     // === Toggle popup ===
     window.toggleChat = () => {
@@ -71,13 +111,13 @@
         const chat = document.getElementById('chat');
         chat.innerHTML = `
           <p class="bot">
-            Hi <strong>${userName}</strong>! I’m <strong>${safeBotName}</strong>. How can I help you today?
+            Hi <strong>${userName}</strong>! I’m <strong>${chatbotName}</strong>. How can I help you today?
             <span class="timestamp">${now()}</span>
           </p>
           <div class="quick-options" id="quickOpts">
-            <button onclick="quickAsk('{{quickOption1}}')">{{quickOption1}}</button>
-            <button onclick="quickAsk('{{quickOption2}}')">{{quickOption2}}</button>
-            <button onclick="quickAsk('{{quickOption3}}')">{{quickOption3}}</button>
+            <button onclick="quickAsk('${quickOption1}')">${quickOption1}</button>
+            <button onclick="quickAsk('${quickOption2}')">${quickOption2}</button>
+            <button onclick="quickAsk('${quickOption3}')">${quickOption3}</button>
           </div>
         `;
       }, 1200);
@@ -90,12 +130,12 @@
 
       const chat = document.getElementById('chat');
       chat.innerHTML +=
-        `<p class="user">${userLabel} ${txt}<span class="timestamp">${now()}</span></p>`;
+        `<p class="user">🙋 You: ${txt}<span class="timestamp">${now()}</span></p>`;
       input.value = '';
       document.getElementById('quickOpts')?.style.setProperty('display', 'none');
 
       const id = 'load-' + Date.now();
-      chat.innerHTML += `<p class="bot" id="${id}">${safeBotName} is thinking…</p>`;
+      chat.innerHTML += `<p class="bot" id="${id}">${chatbotName} is thinking…</p>`;
       chat.scrollTop = chat.scrollHeight;
 
       chatLog += `You: ${txt}\n`;
@@ -106,16 +146,16 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             question: txt,
-            token: '{{token}}'
+            token: token
           })
         });
         const data = await res.json();
 
         document.getElementById(id).outerHTML =
-          `<p class="bot">${safeBotName}: ${data.answer}<span class="timestamp">${now()}</span></p>`;
+          `<p class="bot">${chatbotName}: ${data.answer}<span class="timestamp">${now()}</span></p>`;
         document.getElementById('replySound')?.play();
 
-        chatLog += `${safeBotName}: ${data.answer}\n`;
+        chatLog += `${chatbotName}: ${data.answer}\n`;
 
       } catch {
         document.getElementById(id).innerText =
@@ -134,7 +174,7 @@
             email: userEmail,
             name: userName,
             chat_log: chatLog,
-            token: '{{token}}'
+            token: token
           })
         }).catch(() => { });
       }
