@@ -106,6 +106,9 @@ body {
   padding: 1.2rem 1rem 0.5rem;
   overflow-y: auto;
   background: #fdfbff;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
 }
 
 .chatbox p {
@@ -121,14 +124,25 @@ body {
 .bot {
   background: #ffffff;
   color: #000000;
-box-shadow: 0 8px 22px rgba(0, 0, 0, 0.25);
+  align-self: flex-start;
+  border-radius: 16px;
+  padding: 10px 14px;
+  margin: 6px 0;
+  max-width: 75%;
+  word-wrap: break-word;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .user {
   background: #0066FF;
   color: #ffffff;
-  margin-left: auto;
-box-shadow: 0 8px 22px rgba(0, 0, 0, 0.25);
+  align-self: flex-end;
+  border-radius: 16px;
+  padding: 10px 14px;
+  margin: 6px 0;
+  max-width: 75%;
+  word-wrap: break-word;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .timestamp {
