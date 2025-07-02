@@ -135,11 +135,10 @@
         });
         const data = await res.json();
 
-        document.getElementById(id).outerHTML =
-          `<div class="msg-wrapper bot">
-            <div class="bot-avatar" style="background-image: url('${avatarUrl}')"></div>
-            <p class="bot">${chatbotName}: ${data.answer}<span class="timestamp">${now()}</span></p>
-          </div>`;
+	document.getElementById(id).outerHTML =
+  `	<p class="bot">${chatbotName}: ${data.answer}<span class="timestamp">${now()}</span></p>`;
+
+        
         document.getElementById('replySound')?.play();
 
         chatLog += `${chatbotName}: ${data.answer}\n`;
