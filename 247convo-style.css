@@ -271,13 +271,34 @@ box-shadow: 0 8px 22px rgba(0, 0, 0, 0.25);
 }
 
 .msg-wrapper.bot {
+  display: flex;
   align-items: flex-start;
-  gap: 8px;
+  gap: 10px;
+}
+
+.msg-wrapper.bot .bot-avatar {
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background-size: cover;
+  background-position: center;
+  margin-top: 4px;
 }
 
 .msg-wrapper.bot p {
-  margin-left: 0;
+  margin: 0;
+  background: #ffffff;
+  color: #000000;
+  padding: 10px 14px;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  max-width: 75%;
+  word-wrap: break-word;
+  line-height: 1.4;
+  font-size: 0.95rem;
 }
+
 
 .msg-wrapper.bot .bot-avatar + p {
   margin-top: 0; /* Prevents extra spacing when avatar is present */
