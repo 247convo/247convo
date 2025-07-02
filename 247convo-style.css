@@ -56,7 +56,7 @@ body {
   border-radius: 16px;
   display: flex;
   flex-direction: column;
-  background: #fff;
+  background: #F6F6F7;
   box-shadow: 0 8px 22px rgba(0, 0, 0, 0.25);
   z-index: 999;
   border: 1px solid #ccc;
@@ -74,8 +74,8 @@ body {
 
 /* 🧢 Chat Header */
 .chat-header {
-  background: var(--accent-color);
-  color: #fff;
+  background: #F6F6F7;
+  color: #000000;
   padding: 1rem 2.5rem 1rem 1rem;
   font-weight: bold;
   font-size: 1rem;
@@ -89,7 +89,7 @@ body {
 
 .close-btn {
   position: absolute;
-  border-radius: 50px;
+  border-radius: 60px;
   padding: 4px;
   top: 50%;
   right: 12px;
