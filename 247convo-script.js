@@ -135,10 +135,11 @@
         });
         const data = await res.json();
 
-	document.getElementById(id).outerHTML =
-  `	<p class="bot">${chatbotName}: ${data.answer}<span class="timestamp">${now()}</span></p>`;
+	const bubble = document.getElementById(id);
+	if (bubble) {
+  	bubble.innerHTML = `${chatbotName}: ${data.answer}<span class="timestamp">${now()}</span>`;
+	}
 
-        
         document.getElementById('replySound')?.play();
 
         chatLog += `${chatbotName}: ${data.answer}\n`;
