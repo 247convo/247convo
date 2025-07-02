@@ -62,12 +62,7 @@
       const isOpen = popup.classList.contains('open');
       popup.classList.toggle('open', !isOpen);
       msg.style.display = isOpen ? 'block' : 'none';
-      if (!isOpen) {
-        snd?.play();
-        // ✅ Show lead form, hide chatMain initially
-        document.getElementById('leadForm')?.classList.remove('hidden');
-        document.getElementById('chatMain')?.classList.add('hidden');
-      }
+      if (!isOpen) snd?.play();
     };
 
     bubble.addEventListener('click', window.toggleChat);
@@ -109,9 +104,9 @@
         userEmail = email;
         leadSubmitted = true;
 
-        // ✅ Hide lead form, show chatMain
+        // ✅ Just hide lead form and show chatBox
         document.getElementById('leadForm')?.classList.add('hidden');
-        document.getElementById('chatMain')?.classList.remove('hidden');
+        document.getElementById('chatBox')?.classList.remove('hidden');
 
         const chat = document.getElementById('chat');
         chat.innerHTML = `
