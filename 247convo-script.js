@@ -88,6 +88,10 @@
       if (e.key === 'Enter') handleInput();
     };
 
+    // ✅ Hook up send button to handleInput
+    const sendBtn = document.querySelector('.input-section button');
+    if (sendBtn) sendBtn.addEventListener('click', handleInput);
+
     window.quickAsk = txt => {
       document.getElementById('quickOpts')?.remove();
       document.getElementById('userInput').value = txt;

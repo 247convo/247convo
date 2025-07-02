@@ -28,11 +28,10 @@
 
     <!-- Chat Section (Visible Immediately) -->
     <div id="chatBox">
-  <div class="chatbox" id="chat">
-    <div class="quick-options" id="quickOpts"></div>
-  </div>
-</div>
-
+      <div class="chatbox" id="chat">
+        <!-- Quick Options will be injected here -->
+        <div class="quick-options" id="quickOpts"></div>
+      </div>
 
       <div class="support-link">
         <a href="{{supportUrl}}" target="_blank">
@@ -42,7 +41,7 @@
 
       <div class="input-section">
         <input type="text" id="userInput" placeholder="Type your message…" onkeydown="handleKey(event)" />
-        <button onclick="sendMessage()">Send</button>
+        <button id="sendBtn" onclick="handleSendClick()">Send</button>
       </div>
     </div>
   </div>
