@@ -176,7 +176,7 @@ async def save_chat_summary(req: Request):
         supabase.table("chat_logs").insert({
             "name"      : name,
             "email"     : email,
-            "chat_log"  : chat_log,
+            "chat_log"  : json.dumps(chat_log),  # ✅ Safely serialize JSON
             "timestamp" : timestamp
         }).execute()
 
