@@ -15,42 +15,19 @@
 </head>
 <body>
 
-  <!-- ✅ Chat Bubble (Visible at all times) -->
+  <!-- Chat Bubble -->
   <div id="chat-bubble">💬</div>
   <div id="chat-bubble-msg">Need help? Ask {{chatbotName}}.</div>
 
-  <!-- ✅ Glassmorphic Lead Form (Floating Same Spot as Chat) -->
-  <div id="leadOverlay" class="lead-form-popup hidden">
-    <div class="glass-card lead-form-wrapper">
-      <h3 class="welcome-title">Welcome back</h3>
-      <p class="welcome-subtext">Please enter your details.</p>
-
-      <div class="input-group">
-        <span class="icon">👤</span>
-        <input type="text" id="leadName" placeholder="John Doe" oninput="validateLead()" />
-        <span class="checkmark" id="nameCheck">✅</span>
-      </div>
-
-      <div class="input-group">
-        <span class="icon">✉️</span>
-        <input type="email" id="leadEmail" placeholder="john.doe@example.com" oninput="validateLead()" />
-        <span class="checkmark" id="emailCheck">✅</span>
-      </div>
-
-      <button id="startChatBtn" onclick="submitLead()" disabled>Continue</button>
-      <p id="leadError" class="error-text"></p>
-    </div>
-  </div>
-
-  <!-- ✅ Chat Popup -->
+  <!-- Chat Popup -->
   <div class="chat-popup" id="chatPopup">
     <div class="chat-header">
       {{brandName}} Assistant
       <button class="close-btn" onclick="toggleChat()">✖</button>
     </div>
 
-    <!-- ✅ Chat Section (Hidden until form submitted) -->
-    <div id="chatBox" class="hidden">
+    <!-- Chat Section (Visible Immediately) -->
+    <div id="chatBox">
       <div class="chatbox" id="chat">
         <div class="quick-options" id="quickOpts">
           <button onclick="quickAsk('{{option1}}')">{{option1}}</button>
@@ -60,7 +37,9 @@
       </div>
 
       <div class="support-link">
-        <a href="{{supportUrl}}" target="_blank">📞 Need more help? Contact Support</a>
+        <a href="{{supportUrl}}" target="_blank">
+          📞 Need more help? Contact Support
+        </a>
       </div>
 
       <div class="input-section">
@@ -70,11 +49,11 @@
     </div>
   </div>
 
-  <!-- ✅ Audio -->
+  <!-- Audio -->
   <audio id="bubbleSound" src="https://www.smoothietexts.com/wp-content/uploads/2025/06/mixkit-software-interface-start-2574.wav" preload="auto"></audio>
   <audio id="replySound" src="https://www.smoothietexts.com/wp-content/uploads/2025/06/mixkit-correct-answer-tone-2870.wav" preload="auto"></audio>
 
-  <!-- ✅ JS -->
+  <!-- Load Chat Script -->
   <script src="https://two47convo.onrender.com/247convo-script.js" defer></script>
 </body>
 </html>

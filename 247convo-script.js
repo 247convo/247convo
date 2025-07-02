@@ -37,8 +37,9 @@
     let userName = '';
     let userEmail = '';
     let leadSubmitted = false;
+    let collecting = 'name'; // name > email > ready
 
-    // Inject text based on config
+    // Inject text
     document.title = `${brandName} Chat Widget`;
     if (msg) msg.innerText = `Need help? Ask ${chatbotName}.`;
 
@@ -48,27 +49,16 @@
     const supportLink = document.querySelector('.support-link a');
     if (supportLink) supportLink.href = supportUrl;
 
-    const quickOpts = document.getElementById('quickOpts');
-    if (quickOpts) {
-      quickOpts.innerHTML = `
-        <button onclick="quickAsk('${quickOption1}')">${quickOption1}</button>
-        <button onclick="quickAsk('${quickOption2}')">${quickOption2}</button>
-        <button onclick="quickAsk('${quickOption3}')">${quickOption3}</button>
-      `;
-    }
-
     // === Toggle popup ===
     window.toggleChat = () => {
-      const overlay = document.getElementById('leadOverlay');
-      if (!leadSubmitted && overlay) {
-        overlay.classList.remove('hidden');
-        return;
-      }
-
       const isOpen = popup.classList.contains('open');
       popup.classList.toggle('open', !isOpen);
       msg.style.display = isOpen ? 'block' : 'none';
       if (!isOpen) snd?.play();
+
+      if (!leadSubmitted) {
+        showMessage(`👋 Hello! Before we begin, what’s your **first name**?`);
+      }
     };
 
     bubble.addEventListener('click', window.toggleChat);
@@ -76,79 +66,66 @@
     const now = () =>
       new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-    window.handleKey = e => {
-      if (e.key === 'Enter') {
-        if (!leadSubmitted) submitLead();
-        else sendMessage();
-      }
-    };
-
-    window.quickAsk = txt => {
-      document.getElementById('quickOpts')?.style.setProperty('display', 'none');
-      document.getElementById('userInput').value = txt;
-      sendMessage();
-    };
-
-    window.validateLead = () => {
-      const name = document.getElementById('leadName')?.value.trim();
-      const email = document.getElementById('leadEmail')?.value.trim();
-      const nameCheck = document.getElementById('nameCheck');
-      const emailCheck = document.getElementById('emailCheck');
-      const btn = document.getElementById('startChatBtn');
-
-      const validEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-
-      if (nameCheck) nameCheck.style.display = name ? 'inline' : 'none';
-      if (emailCheck) emailCheck.style.display = validEmail ? 'inline' : 'none';
-      if (btn) btn.disabled = !(name && validEmail);
-    };
-
-    window.submitLead = () => {
-      const name = document.getElementById('leadName')?.value.trim();
-      const email = document.getElementById('leadEmail')?.value.trim();
-      const errorBox = document.getElementById('leadError');
-
-      if (!name || !email) {
-        if (errorBox) errorBox.textContent = 'Please enter both name and email to start.';
-        return;
-      }
-
-      userName = name;
-      userEmail = email;
-      leadSubmitted = true;
-
-      const overlay = document.getElementById('leadOverlay');
-      if (overlay) overlay.classList.add('hidden');
-
-      popup.classList.add('open');
+    const showMessage = (text, isUser = false) => {
       const chat = document.getElementById('chat');
-      chat.innerHTML = `
-        <p class="bot">
-          Hi <strong>${userName}</strong>! I’m <strong>${chatbotName}</strong>. How can I help you today?
-          <span class="timestamp">${now()}</span>
-        </p>
+      const className = isUser ? 'user' : 'bot';
+      const prefix = isUser ? '🙋 You: ' : '';
+      chat.innerHTML += `<p class="${className}">${prefix}${text}<span class="timestamp">${now()}</span></p>`;
+      chat.scrollTop = chat.scrollHeight;
+    };
+
+    const insertQuickOptions = () => {
+      const chat = document.getElementById('chat');
+      chat.innerHTML += `
         <div class="quick-options" id="quickOpts">
           <button onclick="quickAsk('${quickOption1}')">${quickOption1}</button>
           <button onclick="quickAsk('${quickOption2}')">${quickOption2}</button>
           <button onclick="quickAsk('${quickOption3}')">${quickOption3}</button>
-        </div>
-      `;
-
-      document.getElementById('chatBox')?.classList.remove('hidden');
+        </div>`;
     };
 
-    window.sendMessage = async () => {
+    window.handleKey = e => {
+      if (e.key === 'Enter') handleInput();
+    };
+
+    window.quickAsk = txt => {
+      document.getElementById('quickOpts')?.remove();
+      document.getElementById('userInput').value = txt;
+      handleInput();
+    };
+
+    const handleInput = () => {
       const input = document.getElementById('userInput');
       const txt = input.value.trim();
       if (!txt) return;
 
-      const chat = document.getElementById('chat');
-      chat.innerHTML += `
-        <p class="user">🙋 You: ${txt}<span class="timestamp">${now()}</span></p>
-      `;
+      showMessage(txt, true);
       input.value = '';
-      document.getElementById('quickOpts')?.style.setProperty('display', 'none');
 
+      if (!leadSubmitted) {
+        if (collecting === 'name') {
+          userName = txt;
+          showMessage(`Great, ${userName}! Now, what’s your email?`);
+          collecting = 'email';
+        } else if (collecting === 'email') {
+          userEmail = txt;
+          if (!userEmail.includes('@')) {
+            showMessage(`❌ That doesn’t look like a valid email. Please try again.`);
+            return;
+          }
+          collecting = 'done';
+          leadSubmitted = true;
+          showMessage(`✅ Thanks, ${userName}! I’m ${chatbotName}. How can I help you today?`);
+          insertQuickOptions();
+        }
+        return;
+      }
+
+      sendMessage(txt);
+    };
+
+    const sendMessage = async (txt) => {
+      const chat = document.getElementById('chat');
       const id = 'load-' + Date.now();
       chat.innerHTML += `<p class="bot" id="${id}">${chatbotName} is thinking…</p>`;
       chat.scrollTop = chat.scrollHeight;
@@ -159,20 +136,15 @@
         const res = await fetch('https://two47convobot.onrender.com/chat', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            question: txt,
-            token: token
-          })
+          body: JSON.stringify({ question: txt, token: token })
         });
         const data = await res.json();
 
-        document.getElementById(id).outerHTML = `
-          <p class="bot">${chatbotName}: ${data.answer}<span class="timestamp">${now()}</span></p>
-        `;
+        document.getElementById(id).outerHTML =
+          `<p class="bot">${chatbotName}: ${data.answer}<span class="timestamp">${now()}</span></p>`;
         document.getElementById('replySound')?.play();
 
         chatLog += `${chatbotName}: ${data.answer}\n`;
-
       } catch {
         document.getElementById(id).innerText = '⚠️ Sorry, something went wrong.';
       }
@@ -180,6 +152,7 @@
       chat.scrollTop = chat.scrollHeight;
     };
 
+    // Save summary on refresh
     window.addEventListener('beforeunload', () => {
       if (leadSubmitted && chatLog.trim()) {
         fetch('https://two47convobot.onrender.com/summary', {
@@ -191,10 +164,11 @@
             chat_log: chatLog,
             token: token
           })
-        }).catch(() => { });
+        }).catch(() => {});
       }
     });
 
+    // Play welcome sound once
     let soundPlayed = false;
     const playBubbleSoundOnce = () => {
       if (!soundPlayed) {
