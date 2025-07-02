@@ -20,7 +20,6 @@ SUPABASE_URL   = os.getenv("SUPABASE_URL")
 SUPABASE_KEY   = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
 TABLE_NAME     = os.getenv("SUPABASE_TABLE_NAME") or "chat_kb"
 API_TOKEN      = os.getenv("API_TOKEN")
-CONFIG_URL     = os.getenv("CONFIG_URL")
 
 def _mask(s): return f"{s[:4]}…{s[-4:]}" if s else "❌ NONE"
 print("🔧 ENV →", "OPENAI", _mask(OPENAI_API_KEY),
@@ -42,11 +41,11 @@ try:
 except Exception as e:
     print("❌ Failed to load config.json")
     CONFIG = {
-        "chatbotName": "ConvoBot",
+        "chatbotName": "247chatbot",
         "supportUrl": "https://247convo.com/support"
     }
 
-BOT_NAME    = CONFIG.get("chatbotName", "ConvoBot")
+BOT_NAME    = CONFIG.get("chatbotName", "247chatbot")
 SUPPORT_URL = CONFIG.get("supportUrl", "https://247convo.com/support")
 
 # 3. EMBEDDINGS ─────────────────────────────────────────────────────────────
