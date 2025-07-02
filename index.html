@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>{{brandName}} Chat Widget</title>
 
-  <!-- Load CSS from Render -->
+  <!-- Load CSS -->
   <link rel="stylesheet" href="https://two47convo.onrender.com/247convo-style.css" />
   <style>
     .hidden {
@@ -15,69 +15,72 @@
 </head>
 <body>
 
-  <!-- Chat Bubble -->
-  <div id="chat-bubble">💬</div>
+  <!-- ✅ Chat Bubble (Always Visible) -->
+  <div id="chat-bubble" onclick="toggleChat()">💬</div>
   <div id="chat-bubble-msg">Need help? Ask {{chatbotName}}.</div>
 
-  <!-- Chat Popup -->
-  <div class="chat-popup" id="chatPopup">
-    <div class="chat-header">
-      {{brandName}} Assistant
-      <button class="close-btn" onclick="toggleChat()">✖</button>
+  <!-- ✅ Chat Popup Container -->
+  <div class="chat-popup hidden" id="chatPopup">
+
+    <!-- 🔶 Standalone Lead Form Section (Visible First) -->
+    <div id="leadForm" class="lead-form-fullscreen">
+      <div class="glass-card lead-form-wrapper">
+        <h3 class="welcome-title">Welcome back</h3>
+        <p class="welcome-subtext">Please enter your details.</p>
+
+        <div class="input-group">
+          <span class="input-icon">👤</span>
+          <input type="text" id="leadName" placeholder="John Doe" required />
+          <span class="validation-icon" id="nameValid">✅</span>
+        </div>
+
+        <div class="input-group">
+          <span class="input-icon">✉️</span>
+          <input type="email" id="leadEmail" placeholder="john.doe@example.com" required />
+          <span class="validation-icon" id="emailValid">✅</span>
+        </div>
+
+        <button class="lead-submit-btn" onclick="submitLead()">Continue</button>
+        <p id="leadError" class="lead-error-text">Please fill in all fields.</p>
+      </div>
     </div>
 
-    <!-- Lead Form -->
-<div id="leadForm" class="lead-form-section glass-card">
-  <div class="lead-form-wrapper">
-    <h3 class="welcome-title">Welcome back</h3>
-    <p class="welcome-subtext">Please enter your details.</p>
+    <!-- 🔁 Main Chat Interface (Hidden Initially) -->
+    <div id="chatMain" class="hidden">
+      <div class="chat-header">
+        {{brandName}} Assistant
+        <button class="close-btn" onclick="toggleChat()">✖</button>
+      </div>
 
-    <div class="input-group">
-      <span class="input-icon">👤</span>
-      <input type="text" id="leadName" placeholder="John Doe" required />
-      <span class="validation-icon" id="nameValid">✅</span>
-    </div>
+      <div id="chatBox">
+        <div class="chatbox" id="chat">
+          <div class="quick-options" id="quickOpts">
+            <button onclick="quickAsk('{{option1}}')">{{option1}}</button>
+            <button onclick="quickAsk('{{option2}}')">{{option2}}</button>
+            <button onclick="quickAsk('{{option3}}')">{{option3}}</button>
+          </div>
+        </div>
 
-    <div class="input-group">
-      <span class="input-icon">✉️</span>
-      <input type="email" id="leadEmail" placeholder="john.doe@example.com" required />
-      <span class="validation-icon" id="emailValid">✅</span>
-    </div>
+        <div class="support-link">
+          <a href="{{supportUrl}}" target="_blank">
+            📞 Need more help? Contact Support
+          </a>
+        </div>
 
-    <button class="lead-submit-btn" onclick="submitLead()">Continue</button>
-    <p id="leadError" style="color:red; font-size: 0.85rem; display:none; margin-top:0.5rem;"></p>
-  </div>
-</div>
-
-
-    <!-- Chat Section -->
-    <div id="chatBox" class="hidden">
-      <div class="chatbox" id="chat">
-        <div class="quick-options" id="quickOpts">
-          <button onclick="quickAsk('{{option1}}')">{{option1}}</button>
-          <button onclick="quickAsk('{{option2}}')">{{option2}}</button>
-          <button onclick="quickAsk('{{option3}}')">{{option3}}</button>
+        <div class="input-section">
+          <input type="text" id="userInput" placeholder="Type your message…" onkeydown="handleKey(event)" />
+          <button onclick="sendMessage()">Send</button>
         </div>
       </div>
-
-      <div class="support-link">
-        <a href="{{supportUrl}}" target="_blank">
-          📞 Need more help? Contact Support
-        </a>
-      </div>
-
-      <div class="input-section">
-        <input type="text" id="userInput" placeholder="Type your message…" onkeydown="handleKey(event)" />
-        <button onclick="sendMessage()">Send</button>
-      </div>
     </div>
+
   </div>
 
-  <!-- Audio -->
+  <!-- 🔈 Audio -->
   <audio id="bubbleSound" src="https://www.smoothietexts.com/wp-content/uploads/2025/06/mixkit-software-interface-start-2574.wav" preload="auto"></audio>
   <audio id="replySound" src="https://www.smoothietexts.com/wp-content/uploads/2025/06/mixkit-correct-answer-tone-2870.wav" preload="auto"></audio>
 
-  <!-- Load Chat Script -->
+  <!-- ✅ External JS only -->
   <script src="https://two47convo.onrender.com/247convo-script.js" defer></script>
 </body>
 </html>
