@@ -124,20 +124,22 @@ body {
 }
 
 .bot {
-  background: var(--light-accent);
-  color: #222;
+  background: #ffffff;
+  color: #000000;
+box-shadow: 0 8px 22px rgba(0, 0, 0, 0.25);
 }
 
 .user {
-  background: var(--button-color);
-  color: #fff;
+  background: #ffffff;
+  color: #000000;
   margin-left: auto;
+box-shadow: 0 8px 22px rgba(0, 0, 0, 0.25);
 }
 
 .timestamp {
   display: block;
   font-size: 0.7rem;
-  color: #999;
+  color: #000000;
   margin-top: 0.35rem;
 }
 
