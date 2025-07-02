@@ -61,7 +61,7 @@
     const showMessage = (text, isUser = false, isTyping = false, id = '') => {
       const chat = document.getElementById('chat');
       const className = isUser ? 'user' : 'bot';
-      const prefix = isUser ? '🙋 You: ' : '';
+      const prefix = '';
       const avatarHTML = isUser ? '' : `<div class="bot-avatar" style="background-image: url('${avatarUrl}')"></div>`;
       const bubbleID = id ? `id="${id}"` : '';
 
