@@ -39,22 +39,22 @@
     let leadSubmitted = false;
 
     // Inject text based on config
-    document.title = `${brandName} Chat Widget`;
-    if (msg) msg.innerText = `Need help? Ask ${chatbotName}.`;
+    document.title = ${brandName} Chat Widget;
+    if (msg) msg.innerText = Need help? Ask ${chatbotName}.;
 
     const header = popup.querySelector('.chat-header');
-    if (header) header.childNodes[0].textContent = `${brandName} Assistant`;
+    if (header) header.childNodes[0].textContent = ${brandName} Assistant;
 
     const supportLink = document.querySelector('.support-link a');
     if (supportLink) supportLink.href = supportUrl;
 
     const quickOpts = document.getElementById('quickOpts');
     if (quickOpts) {
-      quickOpts.innerHTML = `
+      quickOpts.innerHTML = 
         <button onclick="quickAsk('${quickOption1}')">${quickOption1}</button>
         <button onclick="quickAsk('${quickOption2}')">${quickOption2}</button>
         <button onclick="quickAsk('${quickOption3}')">${quickOption3}</button>
-      `;
+      ;
     }
 
     // === Toggle popup ===
@@ -104,12 +104,12 @@
         userEmail = email;
         leadSubmitted = true;
 
-        // ✅ Just hide lead form and show chatBox
         document.getElementById('leadForm')?.classList.add('hidden');
-        document.getElementById('chatBox')?.classList.remove('hidden');
+        const chatBox = document.getElementById('chatBox');
+        chatBox?.classList.remove('hidden');
 
         const chat = document.getElementById('chat');
-        chat.innerHTML = `
+        chat.innerHTML = 
           <p class="bot">
             Hi <strong>${userName}</strong>! I’m <strong>${chatbotName}</strong>. How can I help you today?
             <span class="timestamp">${now()}</span>
@@ -119,7 +119,7 @@
             <button onclick="quickAsk('${quickOption2}')">${quickOption2}</button>
             <button onclick="quickAsk('${quickOption3}')">${quickOption3}</button>
           </div>
-        `;
+        ;
       }, 1200);
     };
 
@@ -130,15 +130,15 @@
 
       const chat = document.getElementById('chat');
       chat.innerHTML +=
-        `<p class="user">🙋 You: ${txt}<span class="timestamp">${now()}</span></p>`;
+        <p class="user">🙋 You: ${txt}<span class="timestamp">${now()}</span></p>;
       input.value = '';
       document.getElementById('quickOpts')?.style.setProperty('display', 'none');
 
       const id = 'load-' + Date.now();
-      chat.innerHTML += `<p class="bot" id="${id}">${chatbotName} is thinking…</p>`;
+      chat.innerHTML += <p class="bot" id="${id}">${chatbotName} is thinking…</p>;
       chat.scrollTop = chat.scrollHeight;
 
-      chatLog += `You: ${txt}\n`;
+      chatLog += You: ${txt}\n;
 
       try {
         const res = await fetch('https://two47convobot.onrender.com/chat', {
@@ -152,10 +152,10 @@
         const data = await res.json();
 
         document.getElementById(id).outerHTML =
-          `<p class="bot">${chatbotName}: ${data.answer}<span class="timestamp">${now()}</span></p>`;
+          <p class="bot">${chatbotName}: ${data.answer}<span class="timestamp">${now()}</span></p>;
         document.getElementById('replySound')?.play();
 
-        chatLog += `${chatbotName}: ${data.answer}\n`;
+        chatLog += ${chatbotName}: ${data.answer}\n;
 
       } catch {
         document.getElementById(id).innerText =

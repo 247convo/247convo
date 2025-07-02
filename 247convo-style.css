@@ -267,102 +267,6 @@ body {
   z-index: 10;
 }
 
-/* 🟣 Fullscreen Lead Form inside Chat Popup */
-.lead-form-fullscreen {
-  flex: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 1rem;
-  background: linear-gradient(to right, var(--primary-color), var(--accent-color));
-  width: 100%;
-  height: 100%;
-}
-
-/* 🧊 Glassmorphic Card Styling */
-.glass-card.lead-form-wrapper {
-  backdrop-filter: blur(10px);
-  background: rgba(255, 255, 255, 0.08);
-  border-radius: 1rem;
-  padding: 2rem 1.5rem;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
-  color: var(--text-light);
-  width: 100%;
-  max-width: 400px;
-  text-align: center;
-}
-
-/* ✏️ Glass Inputs */
-.input-group {
-  position: relative;
-  display: flex;
-  align-items: center;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 0.6rem;
-  padding: 0.5rem 0.8rem;
-  margin-bottom: 1.2rem;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.input-group input {
-  flex: 1;
-  background: transparent;
-  border: none;
-  outline: none;
-  font-size: 0.95rem;
-  color: var(--text-light);
-  padding-left: 0.5rem;
-}
-
-.input-icon {
-  font-size: 1rem;
-  color: var(--text-light);
-  margin-right: 0.5rem;
-}
-
-.validation-icon {
-  font-size: 1rem;
-  margin-left: 0.5rem;
-  color: #2ecc71;
-}
-
-/* 🚀 CTA Button */
-.lead-submit-btn {
-  background: linear-gradient(to right, var(--button-color), #660066);
-  color: white;
-  font-size: 1rem;
-  padding: 0.75rem 1.5rem;
-  border: none;
-  border-radius: 0.8rem;
-  cursor: pointer;
-  transition: background 0.3s ease;
-  width: 100%;
-}
-
-.lead-submit-btn:hover {
-  background: linear-gradient(to right, #660066, var(--accent-color));
-}
-
-/* 🧾 Welcome Text */
-.welcome-title {
-  font-size: 1.2rem;
-  margin-bottom: 0.5rem;
-  color: var(--text-light);
-}
-
-.welcome-subtext {
-  font-size: 0.9rem;
-  margin-bottom: 1.5rem;
-  color: rgba(255, 255, 255, 0.9);
-}
-
-.lead-error-text {
-  display: none;
-  color: red;
-  font-size: 0.85rem;
-  margin-top: 0.5rem;
-}
-
 /* Responsive */
 @media (max-width: 768px) {
   .chat-popup {
@@ -388,22 +292,6 @@ body {
   .lead-form-wrapper button {
     font-size: 1rem;
     padding: 0.75rem 1rem;
-  }
-
-.lead-form-fullscreen {
-    padding: 1rem;
-  }
-
-  .glass-card.lead-form-wrapper {
-    padding: 1.5rem;
-  }
-
-  .input-group input {
-    font-size: 1rem;
-  }
-
-  .lead-submit-btn {
-    font-size: 1rem;
   }
 }
 
@@ -460,26 +348,4 @@ body {
   #chatBox {
     height: calc(100% - 60px);
   }
-
-.glass-card.lead-form-wrapper {
-    padding: 1.25rem;
-  }
-
-  .welcome-title {
-    font-size: 1.1rem;
-  }
-
-  .welcome-subtext {
-    font-size: 0.95rem;
-  }
-
-  .input-group input {
-    font-size: 0.95rem;
-  }
-
-  .lead-submit-btn {
-    font-size: 1rem;
-    padding: 1rem;
-  }
-
 }
