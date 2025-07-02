@@ -1,12 +1,11 @@
+
 :root {
-  /* fallback colors */
   --primary-color: #1d5e79;
   --accent-color: #800080;
   --light-accent: #d9b3ff;
   --button-color: #800080;
   --text-light: #f9f9f9;
 }
-
 
 body {
   font-family: 'Segoe UI', sans-serif;
@@ -209,100 +208,47 @@ body {
   background: #660066;
 }
 
-/* Lead Form */
-.lead-form-section {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: 1.5rem 1rem;
-  background: #fdfbff;
-}
-
-.lead-form-wrapper {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.lead-form-wrapper p {
-  font-size: 1rem;
-  color: var(--primary-color);
-  text-align: center;
-}
-
-.lead-form-wrapper input {
-  padding: 0.75rem 1rem;
-  border-radius: 10px;
-  border: 1px solid #ccc;
-  font-size: 1rem;
-}
-
-.lead-form-wrapper button {
-  background: var(--button-color);
-  color: white;
-  border: none;
-  padding: 0.75rem 1rem;
-  font-size: 1rem;
-  border-radius: 10px;
-  cursor: pointer;
-}
-
-.lead-form-wrapper button:hover {
-  background: #660066;
-}
-
-#chatBox {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  max-height: 100%;
-  overflow: hidden;
-}
-
-.support-link,
-.input-section {
-  flex-shrink: 0;
-  background: #fafafa;
-  z-index: 10;
-}
-
-/* === NEW: Glass Lead Form Overlay === */
-.lead-form-fullscreen {
+/* Lead Form Glass (floating, colorful) */
+.lead-form-popup {
   position: fixed;
-  inset: 0;
+  bottom: 100px;
+  right: 20px;
+  width: 95%;
+  max-width: 420px;
+  max-height: 600px;
   background: rgba(255, 255, 255, 0.05);
   backdrop-filter: blur(20px);
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  border-radius: 20px;
   z-index: 1001;
-  transition: opacity 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 1.5rem 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  transition: all 0.3s ease;
 }
 
 .glass-card {
-  background: rgba(255, 255, 255, 0.15);
+  background: linear-gradient(145deg, rgba(128, 0, 128, 0.2), rgba(77, 166, 255, 0.2));
   border-radius: 20px;
-  padding: 2rem 1.5rem;
-  max-width: 320px;
-  width: 90%;
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 1.2rem 1rem;
+  width: 100%;
+  box-shadow: 0 6px 30px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
-  gap: 1.2rem;
+  gap: 1rem;
 }
 
 .welcome-title {
   font-size: 1.5rem;
   color: #fff;
   text-align: center;
-  margin-bottom: 0.2rem;
 }
 
 .welcome-subtext {
   font-size: 0.95rem;
-  color: #ddd;
+  color: #eee;
   text-align: center;
   margin: 0;
 }
@@ -310,11 +256,12 @@ body {
 .input-group {
   display: flex;
   align-items: center;
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.15);
   padding: 0.7rem 1rem;
   border-radius: 12px;
   gap: 0.6rem;
   position: relative;
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .input-group input {
@@ -341,7 +288,7 @@ body {
 
 button#startChatBtn {
   padding: 0.75rem;
-  background: linear-gradient(135deg, #4da6ff, #007bff);
+  background: linear-gradient(135deg, #6c5ce7, #00cec9);
   border: none;
   color: #fff;
   font-weight: bold;
@@ -349,6 +296,10 @@ button#startChatBtn {
   cursor: pointer;
   font-size: 1rem;
   transition: background 0.3s ease;
+}
+
+button#startChatBtn:hover {
+  background: linear-gradient(135deg, #5e4bdf, #00bfa6);
 }
 
 button#startChatBtn:disabled {
@@ -362,10 +313,10 @@ button#startChatBtn:disabled {
   font-size: 0.85rem;
 }
 
-
 /* Responsive */
 @media (max-width: 768px) {
-  .chat-popup {
+  .chat-popup,
+  .lead-form-popup {
     width: 95%;
     right: 10px;
     left: 10px;
@@ -373,21 +324,6 @@ button#startChatBtn:disabled {
     bottom: 80px;
     max-width: none;
     max-height: none;
-  }
-
-  .quick-options button {
-    font-size: 0.75rem;
-    padding: 0.3rem 0.7rem;
-  }
-
-  #chat-bubble {
-    bottom: 15px;
-  }
-
-  .lead-form-wrapper input,
-  .lead-form-wrapper button {
-    font-size: 1rem;
-    padding: 0.75rem 1rem;
   }
 }
 
@@ -420,7 +356,8 @@ button#startChatBtn:disabled {
     bottom: 15px;
   }
 
-  .chat-popup {
+  .chat-popup,
+  .lead-form-popup {
     bottom: 80px;
     left: 5px;
     right: 5px;
