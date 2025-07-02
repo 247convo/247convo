@@ -1,4 +1,3 @@
-// === 247Convo Chat Logic with config loader ===
 (function () {
   const CONFIG_URL = "https://two47convo.onrender.com/config.json";
 
@@ -42,14 +41,13 @@
     let leadSubmitted = false;
     let collecting = 'name';
 
-    // ✅ Set Title and Header
     document.title = `${brandName} Chat Widget`;
     if (msg) msg.innerText = `Need help? Ask ${chatbotName}.`;
 
     const headerText = document.getElementById('headerBrand');
     const headerAvatar = document.getElementById('headerAvatar');
 
-    if (headerText) headerText.innerText = `${brandName}`;
+    if (headerText) headerText.innerText = `${brandName} Assistant`;
     if (headerAvatar && avatarUrl) {
       headerAvatar.style.backgroundImage = `url(${avatarUrl})`;
     }
@@ -60,30 +58,23 @@
     const now = () =>
       new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-    // ✅ Show Message with Avatar (bot only)
     const showMessage = (text, isUser = false, isTyping = false, id = '') => {
-  const chat = document.getElementById('chat');
-  const className = isUser ? 'user' : 'bot';
-  const prefix = isUser ? '🙋 You: ' : '';
-  const bubbleID = id ? `id="${id}"` : '';
+      const chat = document.getElementById('chat');
+      const className = isUser ? 'user' : 'bot';
+      const prefix = isUser ? '🙋 You: ' : '';
+      const avatarHTML = isUser ? '' : `<div class="bot-avatar" style="background-image: url('${avatarUrl}')"></div>`;
+      const bubbleID = id ? `id="${id}"` : '';
 
-  // ✅ Only show avatar if bot and NOT typing (prevents duplicate container)
-  const avatarHTML = (!isUser && !isTyping)
-    ? `<div class="bot-avatar" style="background-image: url('${avatarUrl}')"></div>`
-    : '';
-
-  chat.innerHTML += `
-    <div class="msg-wrapper ${className}">
-      ${avatarHTML}
-      <p class="${className}" ${bubbleID}>
-        ${prefix}${text}
-        ${!isTyping ? `<span class="timestamp">${now()}</span>` : ''}
-      </p>
-    </div>`;
-    
-  chat.scrollTop = chat.scrollHeight;
-};
-
+      chat.innerHTML += `
+        <div class="msg-wrapper ${className}">
+          ${avatarHTML}
+          <p class="${className}" ${bubbleID}>
+            ${prefix}${text}
+            ${!isTyping ? `<span class="timestamp">${now()}</span>` : ''}
+          </p>
+        </div>`;
+      chat.scrollTop = chat.scrollHeight;
+    };
 
     const insertQuickOptions = () => {
       const chat = document.getElementById('chat');
@@ -95,7 +86,6 @@
         </div>`;
     };
 
-    // ✅ Handle User Input and Lead Capture
     const handleInput = () => {
       const txt = userInput.value.trim();
       if (!txt) return;
@@ -125,7 +115,6 @@
       sendMessage(txt);
     };
 
-    // ✅ Send to API and Replace Typing Bubble
     const sendMessage = async (txt) => {
       const id = 'load-' + Date.now();
       showMessage(`<span class="typing"><span></span><span></span><span></span></span>`, false, true, id);
@@ -139,10 +128,8 @@
         });
         const data = await res.json();
 
-	const bubble = document.getElementById(id);
-	if (bubble) {
-  	bubble.innerHTML = `${chatbotName}: ${data.answer}<span class="timestamp">${now()}</span>`;
-	}
+        document.getElementById(id).outerHTML =
+          `<p class="bot">${chatbotName}: ${data.answer}<span class="timestamp">${now()}</span></p>`;
 
         document.getElementById('replySound')?.play();
 
@@ -155,20 +142,17 @@
       chat.scrollTop = chat.scrollHeight;
     };
 
-    // ✅ Bind Enter Key and Button
     userInput.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') handleInput();
     });
     sendBtn.addEventListener('click', handleInput);
 
-    // ✅ Quick Ask Buttons
     window.quickAsk = (txt) => {
       document.getElementById('quickOpts')?.remove();
       userInput.value = txt;
       handleInput();
     };
 
-    // ✅ Chat Toggle
     window.toggleChat = () => {
       const isOpen = popup.classList.contains('open');
       popup.classList.toggle('open', !isOpen);
@@ -182,7 +166,6 @@
 
     bubble.addEventListener('click', window.toggleChat);
 
-    // ✅ Save Chat on Exit
     window.addEventListener('beforeunload', () => {
       if (leadSubmitted && chatLog.trim()) {
         fetch('https://two47convobot.onrender.com/summary', {
@@ -198,7 +181,6 @@
       }
     });
 
-    // ✅ Sound Trigger Once
     let soundPlayed = false;
     const playBubbleSoundOnce = () => {
       if (!soundPlayed) {
