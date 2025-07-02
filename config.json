@@ -3,6 +3,7 @@
   "chatbotName": "ConvoBot",
   "supportUrl": "https://247convo.com/support",
   "token": "247convobot-2025",
+  "avatarUrl": "https://two47convo.onrender.com/avatar.png",
   
   "primaryColor": "#1d5e79",
   "accentColor": "#800080",
