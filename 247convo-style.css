@@ -1,10 +1,12 @@
 :root {
-  --primary-color: {{primaryColor}};
-  --accent-color: {{accentColor}};
-  --light-accent: {{lightAccent}};
-  --button-color: {{buttonColor}};
-  --text-light: {{textLight}};
+  /* fallback colors */
+  --primary-color: #1d5e79;
+  --accent-color: #800080;
+  --light-accent: #d9b3ff;
+  --button-color: #800080;
+  --text-light: #f9f9f9;
 }
+
 
 body {
   font-family: 'Segoe UI', sans-serif;
