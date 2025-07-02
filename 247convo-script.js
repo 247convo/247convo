@@ -43,15 +43,15 @@
     let collecting = 'name';
 
     // ✅ Set Title and Header
-    document.title = `${brandName} Chat Widget`;
-    if (msg) msg.innerText = `Need help? Ask ${chatbotName}.`;
+    document.title = ${brandName} Chat Widget;
+    if (msg) msg.innerText = Need help? Ask ${chatbotName}.;
 
     const headerText = document.getElementById('headerBrand');
     const headerAvatar = document.getElementById('headerAvatar');
 
-    if (headerText) headerText.innerText = `${brandName} Assistant`;
+    if (headerText) headerText.innerText = ${brandName} Assistant;
     if (headerAvatar && avatarUrl) {
-      headerAvatar.style.backgroundImage = `url(${avatarUrl})`;
+      headerAvatar.style.backgroundImage = url(${avatarUrl});
     }
 
     const supportLink = document.querySelector('.support-link a');
@@ -62,37 +62,33 @@
 
     // ✅ Show Message with Avatar (bot only)
     const showMessage = (text, isUser = false, isTyping = false, id = '') => {
-  const chat = document.getElementById('chat');
-  const className = isUser ? 'user' : 'bot';
-  const prefix = isUser ? '🙋 You: ' : '';
-  const bubbleID = id ? `id="${id}"` : '';
+      const chat = document.getElementById('chat');
+      const className = isUser ? 'user' : 'bot';
+      const prefix = isUser ? '🙋 You: ' : '';
+      const avatarHTML = isUser
+        ? ''
+        : <div class="bot-avatar" style="background-image: url('${avatarUrl}')"></div>;
+      const bubbleID = id ? id="${id}" : '';
 
-  // ✅ Only show avatar if bot and NOT typing (prevents duplicate container)
-  const avatarHTML = (!isUser && !isTyping)
-    ? `<div class="bot-avatar" style="background-image: url('${avatarUrl}')"></div>`
-    : '';
-
-  chat.innerHTML += `
-    <div class="msg-wrapper ${className}">
-      ${avatarHTML}
-      <p class="${className}" ${bubbleID}>
-        ${prefix}${text}
-        ${!isTyping ? `<span class="timestamp">${now()}</span>` : ''}
-      </p>
-    </div>`;
-    
-  chat.scrollTop = chat.scrollHeight;
-};
-
+      chat.innerHTML += 
+        <div class="msg-wrapper ${className}">
+          ${avatarHTML}
+          <p class="${className}" ${bubbleID}>
+            ${prefix}${text}
+            ${!isTyping ? <span class="timestamp">${now()}</span> : ''}
+          </p>
+        </div>;
+      chat.scrollTop = chat.scrollHeight;
+    };
 
     const insertQuickOptions = () => {
       const chat = document.getElementById('chat');
-      chat.innerHTML += `
+      chat.innerHTML += 
         <div class="quick-options" id="quickOpts">
           <button onclick="quickAsk('${quickOption1}')">${quickOption1}</button>
           <button onclick="quickAsk('${quickOption2}')">${quickOption2}</button>
           <button onclick="quickAsk('${quickOption3}')">${quickOption3}</button>
-        </div>`;
+        </div>;
     };
 
     // ✅ Handle User Input and Lead Capture
@@ -106,17 +102,17 @@
       if (!leadSubmitted) {
         if (collecting === 'name') {
           userName = txt;
-          showMessage(`Great, ${userName}! Now, what’s your email?`);
+          showMessage(Great, ${userName}! Now, what’s your email?);
           collecting = 'email';
         } else if (collecting === 'email') {
           userEmail = txt;
           if (!userEmail.includes('@')) {
-            showMessage(`❌ That doesn’t look like a valid email. Please try again.`);
+            showMessage(❌ That doesn’t look like a valid email. Please try again.);
             return;
           }
           collecting = 'done';
           leadSubmitted = true;
-          showMessage(`✅ Thanks, ${userName}! I’m ${chatbotName}. How can I help you today?`);
+          showMessage(✅ Thanks, ${userName}! I’m ${chatbotName}. How can I help you today?);
           insertQuickOptions();
         }
         return;
@@ -128,8 +124,8 @@
     // ✅ Send to API and Replace Typing Bubble
     const sendMessage = async (txt) => {
       const id = 'load-' + Date.now();
-      showMessage(`<span class="typing"><span></span><span></span><span></span></span>`, false, true, id);
-      chatLog += `You: ${txt}\n`;
+      showMessage(<span class="typing"><span></span><span></span><span></span></span>, false, true, id);
+      chatLog += You: ${txt}\n;
 
       try {
         const res = await fetch('https://two47convobot.onrender.com/chat', {
@@ -141,12 +137,12 @@
 
 	const bubble = document.getElementById(id);
 	if (bubble) {
-  	bubble.innerHTML = `${chatbotName}: ${data.answer}<span class="timestamp">${now()}</span>`;
+  	bubble.innerHTML = ${chatbotName}: ${data.answer}<span class="timestamp">${now()}</span>;
 	}
 
         document.getElementById('replySound')?.play();
 
-        chatLog += `${chatbotName}: ${data.answer}\n`;
+        chatLog += ${chatbotName}: ${data.answer}\n;
       } catch {
         document.getElementById(id).innerHTML = '⚠️ Sorry, something went wrong.';
       }
@@ -176,7 +172,7 @@
       if (!isOpen) snd?.play();
 
       if (!leadSubmitted) {
-        showMessage(`👋 Hello! Before we begin, what’s your name?`);
+        showMessage(👋 Hello! Before we begin, what’s your name?);
       }
     };
 
