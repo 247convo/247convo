@@ -1,0 +1,18 @@
+{
+  "clientID": "healthyzone",
+  "brandName": "HealthyZone",
+  "chatbotName": "Healthyzone",
+  "token": "Healthyzone-2025",
+  "avatarUrl": "https://example.com/avatar.png",
+  "primaryColor": "#1d5e79",
+  "accentColor": "#800080",
+  "lightAccent": "#f9f9f9",
+  "buttonColor": "#800080",
+  "textLight": "#ffffff",
+  "quickOption1": "How do I order?",
+  "quickOption2": "Do you deliver?",
+  "quickOption3": "Talk to a rep",
+  "supportUrl": "https://healthyzone.com/support",
+  "notificationEmail": "jcajiboyeopeyemi@gmail.com",
+  "sheetID": "1yZZZZ...abcd"
+}
