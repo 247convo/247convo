@@ -1,37 +1,23 @@
-// === 247Convo Loader (Dynamic Client Support) ===
+// === 247Convo Loader (with dynamic config support + CSS variable fix) ===
 (function () {
   let started = false;
-
-  // 🔍 Get client ID from URL, fallback to 'default'
-  function getClientID() {
-    const params = new URLSearchParams(window.location.search);
-    return params.get("client") || "default";
-  }
-
-  // 🔁 Lazy-load on interaction
-  ['mouseover', 'touchstart'].forEach(evt =>
-    window.addEventListener(evt, init247Convo, { once: true })
-  );
 
   async function init247Convo() {
     if (started) return;
     started = true;
 
-    const clientID = getClientID();
-    const configURL = `https://two47convo.onrender.com/configs/${clientID}.json`;
-
     try {
-      // ✅ Step 1: Load config
-      const res = await fetch(configURL);
+      // 0. Fetch config.json
+      const res = await fetch('https://two47convo.onrender.com/config.json');
       const config = await res.json();
 
-      // ✅ Step 2: Inject config globally
+      // Inject config as a global JS object
       const configScript = document.createElement('script');
       configScript.type = 'text/javascript';
       configScript.textContent = `window.__247CONVO_CONFIG__ = ${JSON.stringify(config)};`;
       document.head.appendChild(configScript);
 
-      // ✅ Step 3: Set CSS variables from config
+      // ✅ Inject dynamic CSS variables for colors
       const styleVars = document.createElement('style');
       styleVars.innerHTML = `
         :root {
@@ -44,39 +30,48 @@
       `;
       document.head.appendChild(styleVars);
 
-      // ✅ Step 4: Load main CSS
+      // 1. Load CSS file
       const css = document.createElement('link');
       css.rel = 'stylesheet';
       css.href = 'https://two47convo.onrender.com/247convo-style.css';
       document.head.appendChild(css);
 
-      // ✅ Step 5: Load Widget HTML
+      // 2. Load Widget HTML
       const htmlRes = await fetch('https://two47convo.onrender.com/index.html');
       let html = await htmlRes.text();
 
-      // ✅ Step 6: Replace {{placeholders}} with config values
+      // 3. Replace placeholders using config
       Object.entries(config).forEach(([key, value]) => {
         const pattern = new RegExp(`{{\\s*${key}\\s*}}`, 'g');
         html = html.replace(pattern, value);
       });
 
-      // ✅ Step 7: Inject widget HTML into page
+      // 4. Inject HTML
       const wrapper = document.createElement('div');
       wrapper.innerHTML = html;
       document.body.appendChild(wrapper);
 
-      // ✅ Step 8: Load chatbot script with ?client=...
-      injectScript(clientID);
+      // 5. Load JS
+      if (document.readyState === 'complete' || document.readyState === 'interactive') {
+        injectScript();
+      } else {
+        window.addEventListener('DOMContentLoaded', injectScript);
+      }
 
     } catch (err) {
       console.error("❌ 247Convo widget failed to load:", err);
     }
   }
 
-  function injectScript(clientID) {
+  function injectScript() {
     const script = document.createElement('script');
-    script.src = `https://two47convo.onrender.com/247convo-script.js?client=${clientID}`;
+    script.src = 'https://two47convo.onrender.com/247convo-script.js';
     script.defer = false;
     document.body.appendChild(script);
   }
+
+  // Lazy-load only on user interaction
+  ['mouseover', 'touchstart'].forEach(evt =>
+    window.addEventListener(evt, init247Convo, { once: true })
+  );
 })();

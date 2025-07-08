@@ -1,27 +1,19 @@
 (function () {
-  const DEFAULT_CLIENT_ID = "default";
-  const BASE_CONFIG_URL = "https://two47convo.onrender.com/configs";
+  const CONFIG_URL = "https://two47convo.onrender.com/config.json";
 
-  function getClientID() {
-    const params = new URLSearchParams(window.location.search);
-    return params.get("client") || DEFAULT_CLIENT_ID;
-  }
-
-  async function loadConfig(clientID) {
-    const url = `${BASE_CONFIG_URL}/${clientID}.json`;
+  async function loadConfig() {
     try {
-      const res = await fetch(url);
+      const res = await fetch(CONFIG_URL);
       if (!res.ok) throw new Error("Failed to load config");
       return await res.json();
     } catch (err) {
-      console.error("❌ Error loading config:", err);
+      console.error("❌ Error loading config.json:", err);
       return {};
     }
   }
 
   const run = async () => {
-    const clientID = getClientID();
-    const config = await loadConfig(clientID);
+    const config = await loadConfig();
 
     const {
       chatbotName = "247Convo Bot",
@@ -33,8 +25,6 @@
       token = "",
       avatarUrl = "",
     } = config;
-
-    console.log(`🔧 Loaded config for client: ${clientID}`);
 
     const bubble = document.getElementById('chat-bubble');
     const popup = document.getElementById('chatPopup');
@@ -56,6 +46,7 @@
 
     const headerText = document.getElementById('headerBrand');
     const headerAvatar = document.getElementById('headerAvatar');
+
     if (headerText) headerText.innerText = `${brandName} Assistant`;
     if (headerAvatar && avatarUrl) {
       headerAvatar.style.backgroundImage = `url(${avatarUrl})`;
@@ -69,9 +60,8 @@
 
     const showMessage = (text, isUser = false, isTyping = false, id = '') => {
       const chat = document.getElementById('chat');
-      if (!chat) return;
-
       const className = isUser ? 'user' : 'bot';
+      const prefix = '';
       const avatarHTML = isUser ? '' : `<div class="bot-avatar" style="background-image: url('${avatarUrl}')"></div>`;
       const bubbleID = id ? `id="${id}"` : '';
 
@@ -79,7 +69,7 @@
         <div class="msg-wrapper ${className}">
           ${avatarHTML}
           <p class="${className}" ${bubbleID}>
-            ${text}
+            ${prefix}${text}
             ${!isTyping ? `<span class="timestamp">${now()}</span>` : ''}
           </p>
         </div>`;
@@ -88,8 +78,6 @@
 
     const insertQuickOptions = () => {
       const chat = document.getElementById('chat');
-      if (!chat) return;
-
       chat.innerHTML += `
         <div class="quick-options" id="quickOpts">
           <button onclick="quickAsk('${quickOption1}')">${quickOption1}</button>
@@ -132,16 +120,11 @@
       showMessage(`<span class="typing"><span></span><span></span><span></span></span>`, false, true, id);
       chatLog += `You: ${txt}\n`;
 
-      if (!token) {
-        document.getElementById(id).innerHTML = '❌ Configuration error: Missing token.';
-        return;
-      }
-
       try {
         const res = await fetch('https://two47convobot.onrender.com/chat', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ question: txt, token: token, client: clientID })
+          body: JSON.stringify({ question: txt, token: token })
         });
         const data = await res.json();
 
@@ -149,6 +132,7 @@
           `<p class="bot">${chatbotName}: ${data.answer}<span class="timestamp">${now()}</span></p>`;
 
         document.getElementById('replySound')?.play();
+
         chatLog += `${chatbotName}: ${data.answer}\n`;
       } catch {
         document.getElementById(id).innerHTML = '⚠️ Sorry, something went wrong.';
@@ -191,8 +175,7 @@
             email: userEmail,
             name: userName,
             chat_log: chatLog,
-            token: token,
-            client: clientID
+            token: token
           })
         }).catch(() => {});
       }
