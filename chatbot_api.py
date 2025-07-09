@@ -1,7 +1,7 @@
 # ─────────────────────────────────────────────────────────────────────────────
 #  chatbot_api.py – 247Chatbot backend (Multi-client config + Supabase logging)
 # ─────────────────────────────────────────────────────────────────────────────
-import os, ast, re, time, traceback, collections, datetime, requests
+import os, ast, re, time, traceback, collections, datetime, requests, json
 from typing import List, Tuple
 import numpy as np
 
@@ -206,18 +206,23 @@ async def save_chat_summary(req: Request):
         traceback.print_exc()
         return JSONResponse(status_code=500, content={"error": "Internal error"})
 
-# 9. SERVE CONFIG JSON WITH CORS HEADERS ──────────────────────────────────────
+# 9. CONFIG FILE WITH CORS FIX ────────────────────────────────────────────────
 @app.get("/configs/{client_id}.json")
 async def get_config_file(client_id: str):
     filepath = f"configs/{client_id}.json"
     if not os.path.exists(filepath):
         raise HTTPException(status_code=404, detail="Config not found")
-    headers = {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "GET, OPTIONS",
-        "Access-Control-Allow-Headers": "*"
-    }
-    return FileResponse(filepath, media_type="application/json", headers=headers)
+    
+    try:
+        with open(filepath, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        return JSONResponse(content=data, headers={
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "GET, OPTIONS",
+            "Access-Control-Allow-Headers": "*"
+        })
+    except Exception:
+        raise HTTPException(status_code=500, detail="Failed to read config file")
 
 # 10. STATIC ROOT ─────────────────────────────────────────────────────────────
 app.mount("/", StaticFiles(directory=".", html=True), name="static-root")
