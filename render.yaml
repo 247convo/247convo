@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: smoothie-ai-backend
+    name: two47convo-backend
     env: python
     buildCommand: pip install -r requirements.txt
     startCommand: uvicorn chatbot_api:app --host 0.0.0.0 --port 10000
@@ -12,4 +12,5 @@ services:
       - key: SUPABASE_SERVICE_ROLE_KEY
         sync: false
       - key: SUPABASE_TABLE_NAME
-        value: smoothie_knowledge
+        value: client_knowledge_base
+    staticPublishPath: ""  # Disables auto static hosting so FastAPI handles /configs
