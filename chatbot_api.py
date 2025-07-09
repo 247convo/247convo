@@ -22,7 +22,6 @@ TABLE_NAME_LOG = os.getenv("SUPABASE_TABLE_NAME_LOG") or "client_conversations"
 CONFIG_URL_BASE= os.getenv("CONFIG_URL_BASE") or "https://two47convo.onrender.com/configs"
 API_TOKEN      = os.getenv("API_TOKEN")
 
-# Masked printout
 def _mask(s): return f"{s[:4]}…{s[-4:]}" if s else "❌ NONE"
 print("🔧 ENV →", 
       "| SUPABASE_URL", SUPABASE_URL or "❌",
@@ -44,10 +43,15 @@ def fetch_config(client_id: str) -> dict:
         return cfg
     except Exception:
         print(f"❌ Failed to load config for {client_id} – using fallback")
-        return {"chatbotName": "Chatbot", "brandName": "Your Brand", "supportUrl": "#"}
+        return {
+            "chatbotName": "Chatbot",
+            "brandName": "Your Brand",
+            "supportUrl": "#"
+        }
 
 def get_openai_client(client_id: str) -> OpenAI:
-    key = os.getenv(f"OPENAI_API_KEY_{client_id.upper()}", os.getenv("OPENAI_API_KEY"))
+    safe_id = client_id.replace("-", "_").upper()
+    key = os.getenv(f"OPENAI_API_KEY_{safe_id}", os.getenv("OPENAI_API_KEY"))
     if not key:
         raise RuntimeError("❌ No OpenAI key found for client")
     return OpenAI(api_key=key)
@@ -68,19 +72,21 @@ SIM_THRESHOLD = 0.60
 
 def fetch_best_match(q: str, client_id: str, openai_client: OpenAI) -> Tuple[str, float]:
     q_emb = get_embedding(q, openai_client)
-    rows  = supabase.table(TABLE_NAME_KB).select("*").eq("client_id", client_id).execute().data or []
+    rows = supabase.table(TABLE_NAME_KB).select("*").eq("client_id", client_id).execute().data or []
+
     best, best_score = "", -1.0
     for r in rows:
-        emb = ast.literal_eval(r["embedding"]) if isinstance(r["embedding"], str) else r["embedding"]
-        score = cosine(q_emb, emb)
-        if score > best_score:
-            best, best_score = r["content"], score
+        try:
+            emb = ast.literal_eval(r["embedding"]) if isinstance(r["embedding"], str) else r["embedding"]
+            score = cosine(q_emb, emb)
+            if score > best_score:
+                best, best_score = r["content"], score
+        except Exception:
+            continue  # Skip bad rows
     return best, best_score
 
 # 4. GREETING DETECTOR ────────────────────────────────────────────────────────
-GREETING_RE = re.compile(
-    r"\b(hi|hello|hey|howdy|good\s?(morning|afternoon|evening)|what'?s up)\b", re.I
-)
+GREETING_RE = re.compile(r"\b(hi|hello|hey|howdy|good\s?(morning|afternoon|evening)|what'?s up)\b", re.I)
 def is_greeting(t: str) -> bool: return bool(GREETING_RE.search(t.strip()))
 
 # 5. RATE LIMIT ───────────────────────────────────────────────────────────────
@@ -119,7 +125,7 @@ def answer(user_q: str, client_id: str, config: dict, openai_client: OpenAI) -> 
         )
         return chat.choices[0].message.content.strip()
 
-    return f"I couldn’t find that in my knowledge base. Please visit our support page: {config['supportUrl']}"
+    return f"I couldn’t find that in my knowledge base. Please visit our support page: {config.get('supportUrl', '#')}"
 
 # 7. FASTAPI SETUP ────────────────────────────────────────────────────────────
 app = FastAPI()

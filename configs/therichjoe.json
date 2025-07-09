@@ -1,0 +1,15 @@
+{
+  "chatbotName": "JoeBot",
+  "brandName": "The Rich Joe",
+  "supportUrl": "https://therichjoe.com/contact",
+  "primaryColor": "#1A1A1A",
+  "accentColor": "#E2B007",
+  "lightAccent": "#FFF8E0",
+  "buttonColor": "#FF6F00",
+  "textLight": "#F5F5F5",
+  "avatarUrl": "https://therichjoe.com/images/joebot-avatar.png",
+  "quickOption1": "What services do you offer?",
+  "quickOption2": "How can I get started?",
+  "quickOption3": "I need help",
+  "token": "247convobot-2025"
+}

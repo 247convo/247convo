@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>{{brandName}} Chat Widget</title>
+  <title>Chat Widget</title>
 
   <!-- Load CSS from Render -->
   <link rel="stylesheet" href="https://two47convo.onrender.com/247convo-style.css" />
@@ -17,17 +17,17 @@
 
   <!-- Chat Bubble -->
   <div id="chat-bubble">💬</div>
-  <div id="chat-bubble-msg">Need help? Ask {{chatbotName}}.</div>
+  <div id="chat-bubble-msg">Need help? Ask me anything.</div>
 
   <!-- Chat Popup -->
   <div class="chat-popup" id="chatPopup">
     <div class="chat-header">
-  <div class="header-avatar" id="headerAvatar"></div>
-  <span id="headerBrand">{{brandName}} Assistant</span>
+      <div class="header-avatar" id="headerAvatar"></div>
+      <span id="headerBrand">Assistant</span>
       <button class="close-btn" onclick="toggleChat()">➖</button>
     </div>
 
-    <!-- Chat Section (Visible Immediately) -->
+    <!-- Chat Section -->
     <div id="chatBox">
       <div class="chatbox" id="chat">
         <!-- Quick Options will be injected here -->
@@ -35,9 +35,7 @@
       </div>
 
       <div class="support-link">
-        <a href="{{supportUrl}}" target="_blank">
-          📞 Need more help? Contact Support
-        </a>
+        <a href="#" target="_blank" id="supportLink">📞 Need more help? Contact Support</a>
       </div>
 
       <div class="input-section">

@@ -4,7 +4,7 @@
 
   function getClientID() {
     const params = new URLSearchParams(window.location.search);
-    return params.get("client") || DEFAULT_CLIENT_ID;
+    return params.get("client_id") || DEFAULT_CLIENT_ID;
   }
 
   async function loadConfig(clientID) {
@@ -141,7 +141,7 @@
         const res = await fetch('https://two47convobot.onrender.com/chat', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ question: txt, token: token, client: clientID })
+          body: JSON.stringify({ question: txt, token: token, client_id: clientID })
         });
         const data = await res.json();
 
@@ -192,7 +192,7 @@
             name: userName,
             chat_log: chatLog,
             token: token,
-            client: clientID
+            client_id: clientID
           })
         }).catch(() => {});
       }

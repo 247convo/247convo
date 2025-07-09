@@ -5,7 +5,7 @@
   // 🔍 Get client ID from URL, fallback to 'default'
   function getClientID() {
     const params = new URLSearchParams(window.location.search);
-    return params.get("client") || "default";
+    return params.get("client_id") || "default";
   }
 
   // 🔁 Lazy-load on interaction
@@ -23,6 +23,7 @@
     try {
       // ✅ Step 1: Load config
       const res = await fetch(configURL);
+      if (!res.ok) throw new Error(`Failed to load config for ${clientID}`);
       const config = await res.json();
 
       // ✅ Step 2: Inject config globally
@@ -31,15 +32,15 @@
       configScript.textContent = `window.__247CONVO_CONFIG__ = ${JSON.stringify(config)};`;
       document.head.appendChild(configScript);
 
-      // ✅ Step 3: Set CSS variables from config
+      // ✅ Step 3: Set CSS variables from config (safely)
       const styleVars = document.createElement('style');
       styleVars.innerHTML = `
         :root {
-          --primary-color: ${config.primaryColor};
-          --accent-color: ${config.accentColor};
-          --light-accent: ${config.lightAccent};
-          --button-color: ${config.buttonColor};
-          --text-light: ${config.textLight};
+          --primary-color: ${config.primaryColor || ''};
+          --accent-color: ${config.accentColor || ''};
+          --light-accent: ${config.lightAccent || ''};
+          --button-color: ${config.buttonColor || ''};
+          --text-light: ${config.textLight || ''};
         }
       `;
       document.head.appendChild(styleVars);
@@ -54,18 +55,15 @@
       const htmlRes = await fetch('https://two47convo.onrender.com/index.html');
       let html = await htmlRes.text();
 
-      // ✅ Step 6: Replace {{placeholders}} with config values
-      Object.entries(config).forEach(([key, value]) => {
-        const pattern = new RegExp(`{{\\s*${key}\\s*}}`, 'g');
-        html = html.replace(pattern, value);
-      });
+      // ❌ Step Removed: Replacing {{placeholders}} – handled dynamically by script.js
+      // Safer to inject branding via JS to avoid mismatch between loader and index.html
 
-      // ✅ Step 7: Inject widget HTML into page
+      // ✅ Step 6: Inject widget HTML into page
       const wrapper = document.createElement('div');
       wrapper.innerHTML = html;
       document.body.appendChild(wrapper);
 
-      // ✅ Step 8: Load chatbot script with ?client=...
+      // ✅ Step 7: Load chatbot script with ?client_id=...
       injectScript(clientID);
 
     } catch (err) {
@@ -75,8 +73,8 @@
 
   function injectScript(clientID) {
     const script = document.createElement('script');
-    script.src = `https://two47convo.onrender.com/247convo-script.js?client=${clientID}`;
-    script.defer = false;
+    script.src = `https://two47convo.onrender.com/247convo-script.js?client_id=${clientID}`;
+    script.defer = true;
     document.body.appendChild(script);
   }
 })();
