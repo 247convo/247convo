@@ -13,13 +13,6 @@ from dotenv import load_dotenv
 from supabase import create_client
 from openai import OpenAI
 
-# ─────── CORS-ENABLED STATIC FILES ───────
-class CORSEnabledStaticFiles(StaticFiles):
-    async def get_response(self, path, scope):
-        response = await super().get_response(path, scope)
-        response.headers["Access-Control-Allow-Origin"] = "*"
-        return response
-
 # 1. ENVIRONMENT VARIABLES ────────────────────────────────────────────────────
 load_dotenv()
 
@@ -141,8 +134,8 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
     allow_credentials=True,
-    allow_methods=["POST", "OPTIONS"],
-    allow_headers=["Content-Type"],
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 @app.get("/")
@@ -213,6 +206,18 @@ async def save_chat_summary(req: Request):
         traceback.print_exc()
         return JSONResponse(status_code=500, content={"error": "Internal error"})
 
-# 9. STATIC FILES (Frontend Loader + Configs) ─────────────────────────────────
+# 9. SERVE CONFIG JSON WITH CORS HEADERS ──────────────────────────────────────
+@app.get("/configs/{client_id}.json")
+async def get_config_file(client_id: str):
+    filepath = f"configs/{client_id}.json"
+    if not os.path.exists(filepath):
+        raise HTTPException(status_code=404, detail="Config not found")
+    headers = {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, OPTIONS",
+        "Access-Control-Allow-Headers": "*"
+    }
+    return FileResponse(filepath, media_type="application/json", headers=headers)
+
+# 10. STATIC ROOT ─────────────────────────────────────────────────────────────
 app.mount("/", StaticFiles(directory=".", html=True), name="static-root")
-app.mount("/configs", CORSEnabledStaticFiles(directory="configs"), name="client-configs")
