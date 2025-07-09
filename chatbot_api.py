@@ -223,7 +223,7 @@ async def get_config_file(client_id: str):
             content=data,
             media_type="application/json",
             headers={
-                "Access-Control-Allow-Origin": "https://www.therichjoe.com",  # 👈 Or set to 'https://www.therichjoe.com' for stricter control
+                "Access-Control-Allow-Origin": "*",  # 👈 Or set to 'https://www.therichjoe.com' for stricter control
                 "Access-Control-Allow-Methods": "GET, OPTIONS",
                 "Access-Control-Allow-Headers": "*"
             }
