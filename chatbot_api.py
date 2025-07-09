@@ -7,11 +7,18 @@ import numpy as np
 
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 from dotenv import load_dotenv
 from supabase import create_client
 from openai import OpenAI
+
+# ─────── CORS-ENABLED STATIC FILES ───────
+class CORSEnabledStaticFiles(StaticFiles):
+    async def get_response(self, path, scope):
+        response = await super().get_response(path, scope)
+        response.headers["Access-Control-Allow-Origin"] = "*"
+        return response
 
 # 1. ENVIRONMENT VARIABLES ────────────────────────────────────────────────────
 load_dotenv()
@@ -83,7 +90,7 @@ def fetch_best_match(q: str, client_id: str, openai_client: OpenAI) -> Tuple[str
             if score > best_score:
                 best, best_score = r["content"], score
         except Exception:
-            continue  # Skip bad rows
+            continue
     return best, best_score
 
 # 4. GREETING DETECTOR ────────────────────────────────────────────────────────
@@ -208,4 +215,4 @@ async def save_chat_summary(req: Request):
 
 # 9. STATIC FILES (Frontend Loader + Configs) ─────────────────────────────────
 app.mount("/", StaticFiles(directory=".", html=True), name="static-root")
-app.mount("/configs", StaticFiles(directory="configs"), name="client-configs")
+app.mount("/configs", CORSEnabledStaticFiles(directory="configs"), name="client-configs")
