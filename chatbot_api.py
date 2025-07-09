@@ -8,6 +8,7 @@ import numpy as np
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
 from dotenv import load_dotenv
 from supabase import create_client
 from openai import OpenAI
@@ -204,3 +205,7 @@ async def save_chat_summary(req: Request):
         print("❌ CRASH in /summary")
         traceback.print_exc()
         return JSONResponse(status_code=500, content={"error": "Internal error"})
+
+# 9. STATIC FILES (Frontend Loader + Configs) ─────────────────────────────────
+app.mount("/", StaticFiles(directory=".", html=True), name="static-root")
+app.mount("/configs", StaticFiles(directory="configs"), name="client-configs")
