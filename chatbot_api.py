@@ -206,23 +206,32 @@ async def save_chat_summary(req: Request):
         traceback.print_exc()
         return JSONResponse(status_code=500, content={"error": "Internal error"})
 
-# 9. CONFIG FILE WITH CORS FIX ────────────────────────────────────────────────
+# 9. SERVE CONFIG JSON WITH CORS HEADERS ──────────────────────────────────────
+from fastapi.responses import JSONResponse
+
 @app.get("/configs/{client_id}.json")
 async def get_config_file(client_id: str):
     filepath = f"configs/{client_id}.json"
     if not os.path.exists(filepath):
         raise HTTPException(status_code=404, detail="Config not found")
     
+    # ✅ Read JSON and send it with CORS headers
     try:
-        with open(filepath, "r", encoding="utf-8") as f:
-            data = json.load(f)
-        return JSONResponse(content=data, headers={
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Methods": "GET, OPTIONS",
-            "Access-Control-Allow-Headers": "*"
-        })
-    except Exception:
-        raise HTTPException(status_code=500, detail="Failed to read config file")
+        with open(filepath, "r") as f:
+            data = f.read()
+        return JSONResponse(
+            content=data,
+            media_type="application/json",
+            headers={
+                "Access-Control-Allow-Origin": "https://www.therichjoe.com",  # 👈 Or set to 'https://www.therichjoe.com' for stricter control
+                "Access-Control-Allow-Methods": "GET, OPTIONS",
+                "Access-Control-Allow-Headers": "*"
+            }
+        )
+    except Exception as e:
+        print("❌ Failed to read config file:", e)
+        raise HTTPException(status_code=500, detail="Internal server error")
+
 
 # 10. STATIC ROOT ─────────────────────────────────────────────────────────────
 app.mount("/", StaticFiles(directory=".", html=True), name="static-root")
