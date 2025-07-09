@@ -1,0 +1,17 @@
+{
+  "brandName": "247Convo",
+  "chatbotName": "ConvoBot",
+  "supportUrl": "https://247convo.com/support",
+  "token": "247convobot-2025",
+  "avatarUrl": "https://two47convo.onrender.com/avatar.png",
+  
+  "primaryColor": "#1d5e79",
+  "accentColor": "#800080",
+  "lightAccent": "#d9b3ff",
+  "buttonColor": "#800080",
+  "textLight": "#f9f9f9",
+
+  "quickOption1": "What's your pricing?",
+  "quickOption2": "How do I integrate?",
+  "quickOption3": "Talk to a human"
+}
