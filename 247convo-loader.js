@@ -2,10 +2,23 @@
 (function () {
   let started = false;
 
-  // 🔍 Get client ID from URL, fallback to 'default'
+  // ✅ FIXED: Get client ID from page URL or loader script tag
   function getClientID() {
+    // Try to read from page URL
     const params = new URLSearchParams(window.location.search);
-    return params.get("client_id") || "default";
+    const fromPage = params.get("client_id");
+    if (fromPage) return fromPage;
+
+    // Fallback: Try to read from loader <script src="..."> tag
+    const scripts = document.getElementsByTagName('script');
+    for (let s of scripts) {
+      const src = s.getAttribute('src') || '';
+      const match = src.match(/[?&]client_id=([^&]+)/);
+      if (match) return decodeURIComponent(match[1]);
+    }
+
+    // If all fails, fallback to default
+    return "default";
   }
 
   // 🔁 Lazy-load on interaction
@@ -54,9 +67,6 @@
       // ✅ Step 5: Load Widget HTML
       const htmlRes = await fetch('https://two47convo.onrender.com/index.html');
       let html = await htmlRes.text();
-
-      // ❌ Step Removed: Replacing {{placeholders}} – handled dynamically by script.js
-      // Safer to inject branding via JS to avoid mismatch between loader and index.html
 
       // ✅ Step 6: Inject widget HTML into page
       const wrapper = document.createElement('div');
