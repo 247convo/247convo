@@ -33,16 +33,20 @@ API_TOKEN       = os.getenv("API_TOKEN")
 
 # Fail fast if any critical secret is missing
 if not SUPABASE_URL or not SUPABASE_KEY or not API_TOKEN:
-    raise RuntimeError("❌ Missing one or more critical env-vars: SUPABASE_URL, SUPABASE_KEY, or API_TOKEN")
+    raise RuntimeError(
+        "❌ Missing one or more critical env-vars: SUPABASE_URL, SUPABASE_KEY, or API_TOKEN"
+    )
 
 def _mask(s: str) -> str:
     return f"{s[:4]}…{s[-4:]}" if s else "❌ NONE"
 
-print("🔧 ENV →",
-      "| SUPABASE_URL", SUPABASE_URL,
-      "| KB TABLE", TABLE_NAME_KB,
-      "| LOG TABLE", TABLE_NAME_LOG,
-      "| API_TOKEN", _mask(API_TOKEN))
+print(
+    "🔧 ENV →",
+    "| SUPABASE_URL", SUPABASE_URL,
+    "| KB TABLE", TABLE_NAME_KB,
+    "| LOG TABLE", TABLE_NAME_LOG,
+    "| API_TOKEN", _mask(API_TOKEN)
+)
 
 supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
@@ -86,14 +90,22 @@ SIM_THRESHOLD = 0.60
 
 def fetch_best_match(q: str, client_id: str, openai_client: OpenAI) -> Tuple[str, float]:
     q_emb = get_embedding(q, openai_client)
-    rows = supabase.table(TABLE_NAME_KB) \
-                   .select("*") \
-                   .eq("client_id", client_id) \
-                   .execute().data or []
+    rows = (
+        supabase.table(TABLE_NAME_KB)
+        .select("*")
+        .eq("client_id", client_id)
+        .execute()
+        .data
+        or []
+    )
     best, best_score = "", -1.0
     for r in rows:
         try:
-            emb = ast.literal_eval(r["embedding"]) if isinstance(r["embedding"], str) else r["embedding"]
+            emb = (
+                ast.literal_eval(r["embedding"])
+                if isinstance(r["embedding"], str)
+                else r["embedding"]
+            )
             score = cosine(q_emb, emb)
             if score > best_score:
                 best, best_score = r["content"], score
@@ -103,8 +115,7 @@ def fetch_best_match(q: str, client_id: str, openai_client: OpenAI) -> Tuple[str
 
 # 4. GREETING DETECTOR ────────────────────────────────────────────────────────
 GREETING_RE = re.compile(
-    r"\b(hi|hello|hey|howdy|good\s?(morning|afternoon|evening)|what'?s up)\b",
-    re.I
+    r"\b(hi|hello|hey|howdy|good\s?(morning|afternoon|evening)|what'?s up)\b", re.I
 )
 def is_greeting(t: str) -> bool:
     return bool(GREETING_RE.search(t.strip()))
@@ -158,8 +169,8 @@ def answer(user_q: str, client_id: str, config: dict, openai_client: OpenAI) -> 
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
+    allow_origins=["*"],        # allow any origin
+    allow_credentials=False,    # credentials off so wildcard origin is permitted
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -175,7 +186,6 @@ async def options_chat():
 @app.post("/chat")
 async def chat(req: Request):
     payload = await req.json()
-
     token = payload.get("token", "")
     if token != API_TOKEN:
         raise HTTPException(401, "Unauthorized – bad token")
@@ -215,15 +225,15 @@ async def save_chat_summary(req: Request):
         client_id = payload.get("client_id", "").strip()
         timestamp = datetime.datetime.utcnow().isoformat()
 
-        if not name or not email or not chat_log or not client_id:
+        if not (name and email and chat_log and client_id):
             raise HTTPException(400, "Missing required fields.")
 
         supabase.table(TABLE_NAME_LOG).insert({
-            "name": name,
-            "email": email,
-            "chat_log": chat_log,
-            "client_id": client_id,
-            "timestamp": timestamp
+            "name":       name,
+            "email":      email,
+            "chat_log":   chat_log,
+            "client_id":  client_id,
+            "timestamp":  timestamp
         }).execute()
 
         return {"status": "Chat summary saved."}
@@ -238,9 +248,8 @@ async def get_config_file(client_id: str):
     filepath = os.path.join("configs", f"{client_id}.json")
     if not os.path.exists(filepath):
         raise HTTPException(status_code=404, detail="Config not found")
-    # Stream the file directly so it's valid JSON
     return FileResponse(filepath, media_type="application/json")
 
-# 9. STATIC ASSETS (loader, scripts, CSS, fragment) ────────────────────────────
-# Place your frontend files in ./static and serve them under /static
+# 9. STATIC ASSETS ─────────────────────────────────────────────────────────────
+# Place your loader, scripts, CSS, and fragment in ./static
 app.mount("/static", StaticFiles(directory="static"), name="static")
