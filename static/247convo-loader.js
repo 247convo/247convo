@@ -17,7 +17,7 @@ async function init247Convo() {
   started = true;
 
   const clientID = getClientID();
-  const configURL = `https://two47convo.onrender.com/configs/${clientID}.json`;
+  const configURL = `https://two47convo.onrender.com/api/configs/${clientID}?token=secure-config-2025`;
 
   try {
     // Step 1: Load config
@@ -53,7 +53,7 @@ async function init247Convo() {
 
     // Step 5: Load Widget HTML
     const htmlRes = await fetch('https://two47convo.onrender.com/static/index.html', { cache: 'no-cache' });
-    if (!htmlRes.ok) throw new Error(`Failed to load widget HTML: ${htmlRes.status} ${htmlRes.statusText}`);
+    if (!htmlRes.ok) throw new Error(`Failed to load widget HTML: ${res.status} ${res.statusText}`);
     const html = await htmlRes.text();
     const widget = document.createElement('div');
     widget.innerHTML = html;

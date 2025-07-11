@@ -2,7 +2,7 @@ import os, ast, re, time, traceback, collections, datetime, requests, json
 from typing import List, Tuple
 import numpy as np
 
-from fastapi import FastAPI, Request, HTTPException
+from fastapi import FastAPI, Request, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
@@ -17,15 +17,17 @@ SUPABASE_URL   = os.getenv("SUPABASE_URL")
 SUPABASE_KEY   = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
 TABLE_NAME_KB  = os.getenv("SUPABASE_TABLE_NAME_KB") or "client_knowledge_base"
 TABLE_NAME_LOG = os.getenv("SUPABASE_TABLE_NAME_LOG") or "client_conversations"
-CONFIG_URL_BASE= os.getenv("CONFIG_URL_BASE") or "https://two47convo.onrender.com/configs"
+CONFIG_URL_BASE= os.getenv("CONFIG_URL_BASE") or "https://two47convo.onrender.com/api/configs"
 API_TOKEN      = os.getenv("API_TOKEN")
+CONFIG_TOKEN   = os.getenv("CONFIG_TOKEN") or "secure-config-2025"  # New token for config access
 
 def _mask(s): return f"{s[:4]}…{s[-4:]}" if s else "❌ NONE"
 print("🔧 ENV →", 
       "| SUPABASE_URL", SUPABASE_URL or "❌",
       "| KB TABLE", TABLE_NAME_KB,
       "| LOG TABLE", TABLE_NAME_LOG,
-      "| TOKEN", _mask(API_TOKEN))
+      "| API_TOKEN", _mask(API_TOKEN),
+      "| CONFIG_TOKEN", _mask(CONFIG_TOKEN))
 
 if not (SUPABASE_URL and SUPABASE_KEY):
     raise RuntimeError("❌ Critical env-vars missing – aborting boot!")
@@ -35,7 +37,7 @@ supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 # 2. CONFIG + OPENAI LOADING ──────────────────────────────────────────────────
 def fetch_config(client_id: str) -> dict:
     try:
-        url = f"{CONFIG_URL_BASE}/{client_id}.json"
+        url = f"{CONFIG_URL_BASE}/{client_id}?token={CONFIG_TOKEN}"
         cfg = requests.get(url).json()
         print(f"✅ Loaded config for {client_id}:", cfg.get("chatbotName"))
         return cfg
@@ -204,8 +206,10 @@ async def save_chat_summary(req: Request):
         return JSONResponse(status_code=500, content={"error": "Internal error"})
 
 # 9. SERVE CONFIG JSON WITH CORS HEADERS ──────────────────────────────────────
-@app.get("/configs/{client_id}.json")
-async def get_config_file(client_id: str):
+@app.get("/api/configs/{client_id}")
+async def get_config_file(client_id: str, token: str = Query(...)):
+    if token != CONFIG_TOKEN:
+        raise HTTPException(status_code=401, detail="Unauthorized – invalid config token")
     filepath = f"configs/{client_id}.json"
     if not os.path.exists(filepath):
         raise HTTPException(status_code=404, detail=f"Config file for {client_id} not found")
@@ -223,8 +227,7 @@ async def get_config_file(client_id: str):
 # 10. STATIC ROOT ─────────────────────────────────────────────────────────────
 app.mount("/static", StaticFiles(directory="static", html=True), name="static")
 
-# 11. EXCLUDE CONFIGS FROM STATIC SERVING ─────────────────────────────────────
-# Explicitly handle /configs/ to prevent static file serving
+# 11. BLOCK STATIC CONFIG ACCESS ─────────────────────────────────────────────
 @app.get("/configs/{path:path}")
 async def block_configs_static(path: str):
-    raise HTTPException(status_code=404, detail="Config files must be accessed via /configs/{client_id}.json")
+    raise HTTPException(status_code=404, detail="Config files must be accessed via /api/configs/{client_id}")
