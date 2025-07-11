@@ -98,12 +98,12 @@
     // d) Load full stylesheet for chat UI
     const link = document.createElement('link');
     link.rel = 'stylesheet';
-    link.href = 'https://two47convo.onrender.com/247convo-style.css';
+    link.href = 'https://two47convobot.onrender.com/static/247convo-style.css';
     document.head.appendChild(link);
 
     // e) Inject chat widget HTML fragment
     try {
-      const fragRes = await fetch('https://two47convo.onrender.com/widget-fragment.html');
+      const fragRes = await fetch('https://two47convobot.onrender.com/static/widget-fragment.html');
       const fragment = await fragRes.text();
       const wrapper = document.createElement('div');
       wrapper.innerHTML = fragment;
@@ -112,7 +112,7 @@
 
     // f) Load main chatbot logic script
     const script = document.createElement('script');
-    script.src = `https://two47convo.onrender.com/247convo-script.js?client_id=${client_id}`;
+    script.src = `https://two47convobot.onrender.com/static/247convo-script.js?client_id=${client_id}`;
     script.defer = true;
     document.body.appendChild(script);
   }
