@@ -1,6 +1,6 @@
 (function () {
   const DEFAULT_CLIENT_ID = "default";
-  const BASE_CONFIG_URL = "https://two47convo.onrender.com/configs";
+  const BASE_CONFIG_URL = "https://two47convo.onrender.com/api/configs";
 
   function getClientID() {
     const params = new URLSearchParams(window.location.search);
