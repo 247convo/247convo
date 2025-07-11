@@ -68,7 +68,7 @@
     started = true;
 
     const client_id = getClientID();
-    const configURL = `https://two47convo.onrender.com/configs/${client_id}.json`;
+    const configURL = `https://two47convobot.onrender.com/configs/${client_id}.json`;
 
     // a) Fetch client config JSON
     let config = {};
