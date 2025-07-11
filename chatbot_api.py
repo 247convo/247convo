@@ -1,6 +1,3 @@
-# ─────────────────────────────────────────────────────────────────────────────
-#  chatbot_api.py – 247Chatbot backend (Multi-client config + Supabase logging)
-# ─────────────────────────────────────────────────────────────────────────────
 import os, ast, re, time, traceback, collections, datetime, requests, json
 from typing import List, Tuple
 import numpy as np
@@ -207,31 +204,20 @@ async def save_chat_summary(req: Request):
         return JSONResponse(status_code=500, content={"error": "Internal error"})
 
 # 9. SERVE CONFIG JSON WITH CORS HEADERS ──────────────────────────────────────
-from fastapi.responses import JSONResponse
-
 @app.get("/configs/{client_id}.json")
 async def get_config_file(client_id: str):
     filepath = f"configs/{client_id}.json"
     if not os.path.exists(filepath):
         raise HTTPException(status_code=404, detail="Config not found")
-    
-    # ✅ Read JSON and send it with CORS headers
-    try:
-        with open(filepath, "r") as f:
-            data = f.read()
-        return JSONResponse(
-            content=data,
-            media_type="application/json",
-            headers={
-                "Access-Control-Allow-Origin": "*",  # 👈 Or set to 'https://www.therichjoe.com' for stricter control
-                "Access-Control-Allow-Methods": "GET, OPTIONS",
-                "Access-Control-Allow-Headers": "*"
-            }
-        )
-    except Exception as e:
-        print("❌ Failed to read config file:", e)
-        raise HTTPException(status_code=500, detail="Internal server error")
-
+    return FileResponse(
+        filepath,
+        media_type="application/json",
+        headers={
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "GET, OPTIONS",
+            "Access-Control-Allow-Headers": "*"
+        }
+    )
 
 # 10. STATIC ROOT ─────────────────────────────────────────────────────────────
-app.mount("/", StaticFiles(directory=".", html=True), name="static-root")
+app.mount("/static", StaticFiles(directory="static", html=True), name="static")
