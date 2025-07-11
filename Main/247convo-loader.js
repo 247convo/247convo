@@ -1,77 +1,124 @@
-// === 247Convo Loader (with dynamic config support + CSS variable fix) ===
-(function () {
+// File: 247convo-loader.js
+// ––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
+// Shows bubble immediately, then loads full widget.
+// Auto-detects where static files actually live (root vs /static).
+// Configs still come from your API host.
+// ––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––––
+
+(function(){
   let started = false;
 
-  async function init247Convo() {
+  // 1) Figure out:
+//    - where this script was loaded from (static files origin + path prefix)
+//    - where your API lives
+  const loaderTag  = document.currentScript;
+  const loaderUrl  = new URL(loaderTag.src);
+  // e.g. loaderUrl.pathname might be "/static/247convo-loader.js"
+  // strip off the filename to get "/static"
+  const staticPath = loaderUrl.pathname.replace(/\/[^/]+$/, "");
+  const staticHost = loaderUrl.origin + staticPath;
+  const apiHost    = "https://two47convobot.onrender.com";
+
+  // 2) Phase 1: inject bubble shell on DOMContentLoaded
+  document.addEventListener("DOMContentLoaded", () => {
+    injectBubbleShell();
+    window.addEventListener("mousemove", initFullWidget, { once: true });
+  });
+
+  function injectBubbleShell() {
+    const css = document.createElement("style");
+    css.textContent = `
+      /* minimal bubble CSS */
+      #chat-bubble { position:fixed;bottom:20px;right:20px;
+        width:60px;height:60px;border-radius:50%;
+        background:var(--accent-color,#800080);color:#fff;
+        font-size:30px;display:flex;align-items:center;
+        justify-content:center;cursor:pointer;
+        box-shadow:0 4px 14px rgba(0,0,0,0.3);z-index:1000; }
+      #chat-bubble-msg { position:fixed;bottom:90px;right:20px;
+        background:#fff;color:#222;padding:8px 12px;
+        border-radius:8px;font-size:.9rem;
+        box-shadow:0 4px 12px rgba(0,0,0,0.15);z-index:1000; }
+    `;
+    document.head.appendChild(css);
+
+    const bubble = document.createElement("div");
+    bubble.id = "chat-bubble";
+    bubble.textContent = "💬";
+    document.body.appendChild(bubble);
+
+    const msg = document.createElement("div");
+    msg.id = "chat-bubble-msg";
+    msg.textContent = "Need help? Ask us anything.";
+    document.body.appendChild(msg);
+
+    bubble.addEventListener("click", initFullWidget, { once: true });
+  }
+
+  // 3) Phase 2: load full widget on first interaction
+  async function initFullWidget() {
     if (started) return;
     started = true;
 
+    const client_id = getClientID();
+
+    // 3a) fetch config from your API
+    let config = {};
     try {
-      // 0. Fetch config.json
-      const res = await fetch('https://two47convo.onrender.com/config.json');
-      const config = await res.json();
+      const res = await fetch(`${apiHost}/configs/${client_id}.json`);
+      config = res.ok ? await res.json() : {};
+    } catch (e) {
+      console.error("Failed to load config:", e);
+    }
 
-      // Inject config as a global JS object
-      const configScript = document.createElement('script');
-      configScript.type = 'text/javascript';
-      configScript.textContent = `window.__247CONVO_CONFIG__ = ${JSON.stringify(config)};`;
-      document.head.appendChild(configScript);
+    // 3b) expose it globally
+    const cfgScript = document.createElement("script");
+    cfgScript.textContent = `window.__247CONVO_CONFIG__ = ${JSON.stringify(config)};`;
+    document.head.appendChild(cfgScript);
 
-      // ✅ Inject dynamic CSS variables for colors
-      const styleVars = document.createElement('style');
-      styleVars.innerHTML = `
-        :root {
-          --primary-color: ${config.primaryColor};
-          --accent-color: ${config.accentColor};
-          --light-accent: ${config.lightAccent};
-          --button-color: ${config.buttonColor};
-          --text-light: ${config.textLight};
-        }
-      `;
-      document.head.appendChild(styleVars);
+    // 3c) apply theme vars
+    const vars = document.createElement("style");
+    vars.textContent = `
+      :root {
+        --primary-color: ${config.primaryColor||""};
+        --accent-color: ${config.accentColor||""};
+        --button-color: ${config.buttonColor||""};
+        --text-light: ${config.textLight||""};
+      }
+    `;
+    document.head.appendChild(vars);
 
-      // 1. Load CSS file
-      const css = document.createElement('link');
-      css.rel = 'stylesheet';
-      css.href = 'https://two47convo.onrender.com/247convo-style.css';
-      document.head.appendChild(css);
+    // 3d) load full CSS from static host
+    const link = document.createElement("link");
+    link.rel = "stylesheet";
+    link.href = `${staticHost}/247convo-style.css`;
+    document.head.appendChild(link);
 
-      // 2. Load Widget HTML
-      const htmlRes = await fetch('https://two47convo.onrender.com/index.html');
-      let html = await htmlRes.text();
-
-      // 3. Replace placeholders using config
-      Object.entries(config).forEach(([key, value]) => {
-        const pattern = new RegExp(`{{\\s*${key}\\s*}}`, 'g');
-        html = html.replace(pattern, value);
-      });
-
-      // 4. Inject HTML
-      const wrapper = document.createElement('div');
+    // 3e) inject widget HTML fragment
+    try {
+      const frag = await fetch(`${staticHost}/widget-fragment.html`);
+      const html = await frag.text();
+      const wrapper = document.createElement("div");
       wrapper.innerHTML = html;
       document.body.appendChild(wrapper);
-
-      // 5. Load JS
-      if (document.readyState === 'complete' || document.readyState === 'interactive') {
-        injectScript();
-      } else {
-        window.addEventListener('DOMContentLoaded', injectScript);
-      }
-
-    } catch (err) {
-      console.error("❌ 247Convo widget failed to load:", err);
+    } catch (e) {
+      console.error("Failed to load widget fragment:", e);
     }
-  }
 
-  function injectScript() {
-    const script = document.createElement('script');
-    script.src = 'https://two47convo.onrender.com/247convo-script.js';
-    script.defer = false;
+    // 3f) load main logic script from static host
+    const script = document.createElement("script");
+    script.src = `${staticHost}/247convo-script.js?client_id=${client_id}`;
+    script.defer = true;
     document.body.appendChild(script);
   }
 
-  // Lazy-load only on user interaction
-  ['mouseover', 'touchstart'].forEach(evt =>
-    window.addEventListener(evt, init247Convo, { once: true })
-  );
+  // Utility: read client_id from URL or this tag
+  function getClientID() {
+    const p = new URLSearchParams(window.location.search);
+    if (p.get("client_id")) return p.get("client_id");
+    // fallback: check src for ?client_id=
+    const m = loaderTag.src.match(/[?&]client_id=([^&]+)/);
+    if (m) return decodeURIComponent(m[1]);
+    return "default";
+  }
 })();
