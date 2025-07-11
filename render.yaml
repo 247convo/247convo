@@ -1,18 +1,30 @@
 services:
+  # ──────────────────────────────────────────────────────────────────────────
+  # Service A: FastAPI backend (configs, /chat, /summary) with CORS
+  # ──────────────────────────────────────────────────────────────────────────
   - type: web
-    name: two47convobot
+    name: two47convobot-api
     env: python
     buildCommand: pip install -r requirements.txt
     startCommand: uvicorn chatbot_api:app --host 0.0.0.0 --port 10000
     envVars:
       - key: OPENAI_API_KEY
+        sync: false
       - key: SUPABASE_URL
+        sync: false
       - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
       - key: API_TOKEN
+        sync: false
       - key: SUPABASE_TABLE_NAME_KB
         value: client_knowledge_base
       - key: SUPABASE_TABLE_NAME_LOG
         value: client_conversations
+    staticPublishPath: ""  # no static hosting here
 
-    # <-- here’s the change: publish your `static/` folder
+  # ──────────────────────────────────────────────────────────────────────────
+  # Service B: Static site (loader, fragment, CSS, JS) with wildcard CORS
+  # ──────────────────────────────────────────────────────────────────────────
+  - type: static
+    name: two47convo-static
     staticPublishPath: static
