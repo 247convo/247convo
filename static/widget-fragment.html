@@ -1,0 +1,50 @@
+<!-- File: widget-fragment.html -->
+<!-- This is the exact HTML fragment your loader will inject into the page’s <body> -->
+
+<!-- 1. Chat Bubble Shell -->
+<div id="chat-bubble">💬</div>
+<div id="chat-bubble-msg">Need help? Ask us anything.</div>
+
+<!-- 2. Chat Popup Container -->
+<div class="chat-popup" id="chatPopup">
+  <div class="chat-header">
+    <div class="header-avatar" id="headerAvatar"></div>
+    <span id="headerBrand">Assistant</span>
+    <button class="close-btn" onclick="toggleChat()">➖</button>
+  </div>
+
+  <div id="chatBox">
+    <div class="chatbox" id="chat">
+      <!-- Quick options injected here -->
+      <div class="quick-options" id="quickOpts"></div>
+    </div>
+
+    <div class="support-link">
+      <a href="#" target="_blank" id="supportLink">
+        📞 Need more help? Contact Support
+      </a>
+    </div>
+
+    <div class="input-section">
+      <input
+        type="text"
+        id="userInput"
+        placeholder="Type your message…"
+        onkeydown="handleKey(event)"
+      />
+      <button id="sendBtn" onclick="handleSendClick()">Send</button>
+    </div>
+  </div>
+
+  <!-- 3. Notification Sounds -->
+  <audio
+    id="bubbleSound"
+    src="https://www.smoothietexts.com/wp-content/uploads/2025/06/mixkit-software-interface-start-2574.wav"
+    preload="auto"
+  ></audio>
+  <audio
+    id="replySound"
+    src="https://www.smoothietexts.com/wp-content/uploads/2025/06/mixkit-correct-answer-tone-2870.wav"
+    preload="auto"
+  ></audio>
+</div>
