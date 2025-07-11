@@ -20,7 +20,7 @@ load_dotenv()
 SUPABASE_URL    = os.getenv("SUPABASE_URL")
 SUPABASE_KEY    = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
 API_TOKEN       = os.getenv("API_TOKEN")
-CONFIG_BASE     = os.getenv("CONFIG_URL_BASE") or "https://two47convo.onrender.com/configs"
+CONFIG_BASE     = os.getenv("CONFIG_URL_BASE") or "https://two47convobot.onrender.com/configs"
 TABLE_KB        = os.getenv("SUPABASE_TABLE_NAME_KB")  or "client_knowledge_base"
 TABLE_LOG       = os.getenv("SUPABASE_TABLE_NAME_LOG") or "client_conversations"
 

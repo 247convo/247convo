@@ -3,7 +3,7 @@
 
 (function () {
   const DEFAULT_CLIENT_ID = "default";
-  const BASE_CONFIG_URL  = "https://two47convo.onrender.com/configs";
+  const BASE_CONFIG_URL  = "https://two47convobot.onrender.com/configs";
 
   // 1️⃣ Read client_id consistently
   function getClientID() {
