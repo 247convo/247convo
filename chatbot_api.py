@@ -1,4 +1,4 @@
-─────────────────────────────────────────────────────────────────────────────
+# ─────────────────────────────────────────────────────────────────────────────
 #  chatbot_api.py – 247Chatbot backend (Multi-client config + Supabase logging)
 # ─────────────────────────────────────────────────────────────────────────────
 import os, ast, re, time, traceback, collections, datetime, requests, json
