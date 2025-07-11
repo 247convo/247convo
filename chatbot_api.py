@@ -208,16 +208,23 @@ async def save_chat_summary(req: Request):
 async def get_config_file(client_id: str):
     filepath = f"configs/{client_id}.json"
     if not os.path.exists(filepath):
-        raise HTTPException(status_code=404, detail="Config not found")
+        raise HTTPException(status_code=404, detail=f"Config file for {client_id} not found")
     return FileResponse(
         filepath,
         media_type="application/json",
         headers={
             "Access-Control-Allow-Origin": "*",
             "Access-Control-Allow-Methods": "GET, OPTIONS",
-            "Access-Control-Allow-Headers": "*"
+            "Access-Control-Allow-Headers": "*",
+            "Cache-Control": "no-cache"
         }
     )
 
 # 10. STATIC ROOT ─────────────────────────────────────────────────────────────
 app.mount("/static", StaticFiles(directory="static", html=True), name="static")
+
+# 11. EXCLUDE CONFIGS FROM STATIC SERVING ─────────────────────────────────────
+# Explicitly handle /configs/ to prevent static file serving
+@app.get("/configs/{path:path}")
+async def block_configs_static(path: str):
+    raise HTTPException(status_code=404, detail="Config files must be accessed via /configs/{client_id}.json")
